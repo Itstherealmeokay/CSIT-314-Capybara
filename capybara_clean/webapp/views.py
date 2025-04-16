@@ -15,7 +15,7 @@ def register(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('my-login')
+            return redirect('login')
 
     context = {'form': form}
     return render(request, 'webapp/register.html', context)
@@ -25,13 +25,24 @@ def login(request):
 
     if request.method == 'POST':
         form = LoginForm()
-        username = request.POST.get['username']
-        password = request.POST.get['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             auth.login(request, user)
-            return redirect('home')
+            return redirect('')
 
     context = {'form': form}
     return render(request, 'webapp/login.html', context)
+
+
+@login_required(login_url='login')
+def dashboard(request):
+    return render(request, 'webapp/dashboard.html')
+
+
+
+def logout(request):
+    auth.logout(request)
+    return redirect('login')
