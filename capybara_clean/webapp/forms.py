@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
-from .models import CustomUser
+from .models import CustomUser, UserProfile
+
 
 class CreateUserForm(UserCreationForm):
     role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES)
@@ -14,3 +15,8 @@ class CreateUserForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=TextInput())
     password = forms.CharField(widget=PasswordInput())
+    
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['full_name', 'address', 'phone_number']
