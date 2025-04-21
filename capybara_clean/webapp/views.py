@@ -44,21 +44,19 @@ def edit_profile(request):
     context = {'form': form}
     return render(request, 'webapp/edit_profile.html', context)
 
-def login(request):
-    form = LoginForm()
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'webapp/login.html', {'form': LoginForm()})
 
-    if request.method == 'POST':
+    def post(self, request):
         form = LoginForm()
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             auth.login(request, user)
             return redirect('dashboard')
-
-    context = {'form': form}
-    return render(request, 'webapp/login.html', context)
+        return render(request, 'webapp/login.html', {'form': form})
 
 
 @login_required(login_url='login')
