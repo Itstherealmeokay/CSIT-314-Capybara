@@ -4,7 +4,6 @@ from django.conf import settings
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
-        ('admin', 'Admin'),
         ('homeowner', 'Homeowner'),
         ('cleaner', 'Cleaner'),
     ]

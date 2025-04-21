@@ -64,12 +64,13 @@ def login(request):
 @login_required(login_url='login')
 def dashboard(request):
     user = request.user
-    if user.role == 'admin':
-        return render(request, 'webapp/admin_dashboard.html', {'user': user})
+    if user.is_staff:
+        return redirect('/admin/')
     elif user.role == 'homeowner':
-        return render(request, 'webapp/homeowner_dashboard.html', {'user': user})
+        return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
-        return render(request, 'webapp/cleaner_dashboard.html', {'user': user})
+        return render(request, 'webapp/dashboard_cleaner.html', {'user': user})
+    return f"Unknown role {user}"
 
 def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
