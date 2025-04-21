@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
+from django.views import View
 from .forms import CreateUserForm, LoginForm, UserProfileForm
-from . models import UserProfile
+from . models import UserProfile, Homeowner, Cleaner
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -9,17 +10,23 @@ from django.contrib.auth.decorators import login_required
 def home(request):
     return render(request, 'webapp/index.html')
 
-def register(request):
-    form = CreateUserForm()
-
-    if request.method == 'POST':
+class RegisterView(View):
+    def get(self, request):
+        return render(request, 'webapp/register.html', {'form': CreateUserForm()})
+    
+    def post(self, request):
         form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-
-    context = {'form': form}
-    return render(request, 'webapp/register.html', context)
+        if not form.is_valid():
+            return render(request, 'webapp/register.html', {'form': form})
+        user = form.save(commit=False)
+        role = form.cleaned_data['role']
+        user.role = role
+        user.save()
+        if role == 'homeowner':
+            Homeowner.objects.create(user=user)
+        elif role == 'cleaner':
+            Cleaner.objects.create(user=user)
+        return redirect('login')
 
 def edit_profile(request):
     user = request.user
@@ -36,6 +43,7 @@ def edit_profile(request):
 
     context = {'form': form}
     return render(request, 'webapp/edit_profile.html', context)
+
 def login(request):
     form = LoginForm()
 

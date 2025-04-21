@@ -7,7 +7,8 @@ from .models import CustomUser, UserProfile
 
 
 class CreateUserForm(UserCreationForm):
-    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES)
+    # TODO: Double check if you allow people to be admin from this
+    role = forms.ChoiceField(label="What role are you registering as?", choices=CustomUser.ROLE_CHOICES)
     class Meta:
         model = CustomUser  
         fields = ['username','password1', 'password2', 'role']
