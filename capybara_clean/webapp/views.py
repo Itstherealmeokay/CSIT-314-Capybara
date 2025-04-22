@@ -5,6 +5,7 @@ from . models import UserProfile, Homeowner, Cleaner
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 
 def home(request):
@@ -68,11 +69,14 @@ def dashboard(request):
         return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
         return render(request, 'webapp/dashboard_cleaner.html', {'user': user})
-    return f"Unknown role {user}"
+    return HttpResponse(f"Unknown role {user}")
 
 def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     return render(request, 'webapp/view_profile.html', {'profile': profile})
+
+def browse_cleaners(request):
+    return render(request, 'webapp/browsecleaners.html')
 
 def logout(request):
     auth.logout(request)
