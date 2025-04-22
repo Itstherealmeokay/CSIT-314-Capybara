@@ -9,6 +9,9 @@
 
     <img src="{% static 'css/capyclean.png' %}" alt="Capybara" width="300" height="300">
     <br><br>
-    <a class="btn btn-primary" href="{% url 'register' %}">Sign Up</a>
+    <div class="d-flex gap-5 justify-content-center">
+        <a class="btn btn-primary" href="{% url 'register' %}">Sign Up</a>
+        <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+    </div>
 </div>
 {% endblock %}
