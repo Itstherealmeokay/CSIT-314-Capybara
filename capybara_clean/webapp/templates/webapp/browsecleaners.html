@@ -3,5 +3,23 @@
 {%block content%}
 
 <h3>Browse Cleaners</h3>
+<div class="container mt-5">
+  <form method="get" class="mb-4 d-flex justify-content-center">
+    <input type="text" name="q" class="form-control w-50 me-2" placeholder="Search by username..." value="{{ query|default:'' }}">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
 
+  {% if cleaners %}
+    <div class="list-group">
+      {% for cleaner in cleaners %}
+        <a href="{% url 'cleaner_profile' cleaner.pk %}" class="list-group-item list-group-item-action">
+          <h5 class="mb-1">{{ cleaner.user.username }}</h5>
+          <small>{{ cleaner.phone_number }}</small>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted text-center">No cleaners found.</p>
+  {% endif %}
+</div>
 {%endblock%}

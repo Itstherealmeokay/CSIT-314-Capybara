@@ -21,7 +21,8 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
     
 class Homeowner(UserProfile):
-    properties = models.ManyToManyField('Property', related_name='homeowners', blank=True) 
+    properties = models.ManyToManyField('Property', related_name='homeowners', blank=True)
+    favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_homeowners', blank=True)
 
 class Cleaner(UserProfile):
     cleaning_requests = models.ManyToManyField('CleaningRequest', related_name='cleaners', blank=True)

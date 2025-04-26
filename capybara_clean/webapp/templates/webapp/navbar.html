@@ -28,8 +28,17 @@
           <a class="nav-link" href="{% url 'dashboard' %}">Dashboard<i class="fa fa-home" aria-hidden="true"></i></a>
         </li>
         <li class="nav-item me-4">
-          <a class="nav-link" href="{% url 'view_profile' %}">My Profile<i class="fa fa-user" aria-hidden="true"></i></a>
+          <a class="nav-link" href="{% url 'view_profile' %}">Profile<i class="fa fa-user" aria-hidden="true"></i></a>
         </li>
+        {% if user.role == 'homeowner' %}
+          <li class="nav-item me-4">
+            <a class="nav-link" href="{% url 'browsecleaners' %}">Browse Cleaners<i class="fa fa-users" aria-hidden="true"></i></a>
+          </li>
+        {% elif user.role == 'cleaner' %}
+          <li class="nav-item me-4">
+            <a class="nav-link">Cleaning Tasks<i class="fa fa-users" aria-hidden="true"></i></a>
+          </li>
+        {% endif %}
         <li class="nav-item me-4">
           <a class="nav-link" href="{% url 'logout' %}">Sign out<i class="fa fa-sign-out" aria-hidden="true"></i></a>
         </li>

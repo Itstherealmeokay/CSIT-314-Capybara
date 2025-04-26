@@ -10,5 +10,6 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'), 
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('view_profile/', views.view_profile, name='view_profile'),
-    path('browsecleaners/', views.browse_cleaners, name='browsecleaners')
+    path('cleaner/<int:pk>/', views.CleanerProfile.as_view(), name='cleaner_profile'),
+    path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
 ]

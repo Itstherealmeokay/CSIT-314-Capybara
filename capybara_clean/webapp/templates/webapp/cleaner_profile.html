@@ -1,0 +1,25 @@
+{% extends 'webapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bg-light shadow-md, p-5">
+  <h2>{{ cleaner.user.username }}'s Profile</h2>
+  <hr>
+  <p><strong>Name:</strong> {{ cleaner.full_name }}</p>
+  <p><strong>Email:</strong> {{ cleaner.email }}</p>
+  <p><strong>Phone Number:</strong> {{ cleaner.phone_number }}</p>
+  <p><strong>Address:</strong> {{ cleaner.address }}</p>
+
+  {% if is_favourited %}
+    <form method="POST" action="{% url 'cleaner_profile' cleaner.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger mt-3">Remove from favourites</button>
+    </form>
+  {% else %}
+    <form method="POST" action="{% url 'cleaner_profile' cleaner.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success mt-3">Add to favourites</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

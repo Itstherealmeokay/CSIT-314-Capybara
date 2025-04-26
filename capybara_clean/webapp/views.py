@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from .forms import CreateUserForm, LoginForm, UserProfileForm
-from . models import UserProfile, Homeowner, Cleaner
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+
+from .forms import CreateUserForm, LoginForm, UserProfileForm
+from .models import UserProfile, Homeowner, Cleaner
 
 
 def home(request):
@@ -75,8 +77,30 @@ def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     return render(request, 'webapp/view_profile.html', {'profile': profile})
 
+class CleanerProfile(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        cleaner = get_object_or_404(Cleaner, pk=pk)
+        is_favourited = Homeowner.objects.get(user=request.user).favourite_cleaners.contains(cleaner)
+        return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
+    
+    def post(self, request, pk):
+        favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners
+        cleaner = get_object_or_404(Cleaner, pk=pk)
+        if favourite_cleaners.contains(cleaner):
+            favourite_cleaners.remove(cleaner)
+        else:
+            favourite_cleaners.add(cleaner)
+        is_favourited = favourite_cleaners.contains(cleaner)
+        return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
+
 def browse_cleaners(request):
-    return render(request, 'webapp/browsecleaners.html')
+    query = request.GET.get('q')
+    cleaners = Cleaner.objects.all()
+
+    if query:
+        cleaners = Cleaner.objects.filter(user__username__icontains=query)
+
+    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query})
 
 def logout(request):
     auth.logout(request)
