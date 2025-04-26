@@ -3,6 +3,26 @@
 {%block content%}
 
 <h3>Browse Cleaners</h3>
+<div class="container-fluid">
+  <!-- Side-scrolling container -->
+  <div class="d-flex flex-nowrap overflow-auto py-2">
+    {% for cleaner in favourite_cleaners %}
+      <div class="card m-2" style="min-width: 120px; height: 120px;">
+        <div class="card-body position-relative">
+          <!-- Item content -->
+          <h2 class="card-title">{{ cleaner.full_name }}</h2>
+          
+          <!-- Removal form -->
+          <form method="DELETE" action="{% url 'browsecleaners' %}" 
+                class="position-absolute top-0 end-0 mt-1 me-1">
+            {% csrf_token %}
+            <button type="submit" class="btn-close" aria-label="Remove"></button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 <div class="container mt-5">
   <form method="get" class="mb-4 d-flex justify-content-center">
     <input type="text" name="q" class="form-control w-50 me-2" placeholder="Search by username..." value="{{ query|default:'' }}">
@@ -13,7 +33,7 @@
     <div class="list-group">
       {% for cleaner in cleaners %}
         <a href="{% url 'cleaner_profile' cleaner.pk %}" class="list-group-item list-group-item-action">
-          <h5 class="mb-1">{{ cleaner.user.username }}</h5>
+          <h5 class="mb-1">{{ cleaner.full_name }}</h5>
           <small>{{ cleaner.phone_number }}</small>
         </a>
       {% endfor %}

@@ -96,11 +96,12 @@ class CleanerProfile(LoginRequiredMixin, View):
 def browse_cleaners(request):
     query = request.GET.get('q')
     cleaners = Cleaner.objects.all()
+    favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners.all()
 
     if query:
         cleaners = Cleaner.objects.filter(user__username__icontains=query)
 
-    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query})
+    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
 def logout(request):
     auth.logout(request)

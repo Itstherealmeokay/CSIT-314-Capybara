@@ -22,7 +22,7 @@ class UserProfile(models.Model):
     
 class Homeowner(UserProfile):
     properties = models.ManyToManyField('Property', related_name='homeowners', blank=True)
-    favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_homeowners', blank=True)
+    favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)
 
 class Cleaner(UserProfile):
     cleaning_requests = models.ManyToManyField('CleaningRequest', related_name='cleaners', blank=True)
