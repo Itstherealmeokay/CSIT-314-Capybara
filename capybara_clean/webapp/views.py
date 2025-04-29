@@ -5,9 +5,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 
-from .forms import CreateUserForm, LoginForm, UserProfileForm, CleaningListingForm
-from .models import UserProfile, Homeowner, Cleaner, CleaningListing
+
+from .forms import CreateUserForm, LoginForm, UserProfileForm, CleaningListingForm, ServiceCategoryForm
+from .models import UserProfile, Homeowner, Cleaner, CleaningListing, Platform_Manager, ServiceCategory  
 
 
 def home(request):
@@ -29,6 +32,8 @@ class RegisterView(View):
             Homeowner.objects.create(user=user)
         elif role == 'cleaner':
             Cleaner.objects.create(user=user)
+        elif role == 'platform_manager':
+            Platform_Manager.objects.create(user=user)
         return redirect('login')
 
 def edit_profile(request):
@@ -71,6 +76,8 @@ def dashboard(request):
         return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
         return render(request, 'webapp/dashboard_cleaner.html', {'user': user})
+    elif user.role == 'platform manager':
+        return render(request, 'webapp/dashboard_platformmanager.html', {'user': user})
     return HttpResponse(f"Unknown role {user}")
 
 def view_profile(request):
@@ -121,11 +128,43 @@ def create_cleaning_listing(request):
             listing = form.save(commit=False)
             listing.status = 'active'  # or set default
             listing.save()
-            return redirect('webapp/cleaning_listings.html')
+            return redirect('cleaning_listings')
     else:
         form = CleaningListingForm()
 
     return render(request, 'webapp/create_cleaning_listing.html', {'form': form})
+
+@login_required
+def delete_cleaning_listing(request, listing_id):
+    listing = get_object_or_404(CleaningListing, id=listing_id) 
+    listing.delete()
+
+   
+    return redirect('cleaning_listings')
+
+def add_service_category(request):
+    if request.user.role != 'platform manager':
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        form = ServiceCategoryForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            if ServiceCategory.objects.filter(name=name).exists():
+                messages.error(request, 'Service category already exists.')
+            else:
+                form.save()
+                messages.success(request, 'Service category added successfully.')
+                return redirect('dashboard')
+            
+    else:
+        form = ServiceCategoryForm()
+        
+    return render(request, 'webapp/add_category.html', {'form': form})
+
+def view_service_category(request):
+    categories = ServiceCategory.objects.all()
+    return render(request, 'webapp/view_category.html', {'categories': categories})
 
 def logout(request):
     auth.logout(request)

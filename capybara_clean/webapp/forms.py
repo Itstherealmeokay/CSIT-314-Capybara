@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
-from .models import CustomUser, UserProfile, CleaningListing
+from .models import CustomUser, UserProfile, CleaningListing, ServiceCategory
 
 
 class CreateUserForm(UserCreationForm):
@@ -36,3 +36,8 @@ class CleaningListingForm(forms.ModelForm):
             'date_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'date_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+        
+class ServiceCategoryForm(forms.ModelForm):
+    class Meta:
+        model = ServiceCategory
+        fields = ['name']

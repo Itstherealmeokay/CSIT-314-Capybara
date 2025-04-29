@@ -1,0 +1,17 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+  <h1>Service Categories</h1>
+
+  <a href="{% url 'add_service_category' %}">
+    <button>Add Category</button>
+  </a>
+
+  <ul>
+    {% for category in categories %}
+      <li>{{ category.name }}</li>
+    {% empty %}
+      <li>No categories yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

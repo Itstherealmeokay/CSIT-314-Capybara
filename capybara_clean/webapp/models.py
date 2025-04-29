@@ -6,8 +6,9 @@ class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('homeowner', 'Homeowner'),
         ('cleaner', 'Cleaner'),
+        ('platform manager', 'Platform Manager'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES)
 
 #Profile
 
@@ -31,9 +32,18 @@ class Cleaner(UserProfile):
 class Property(models.Model):
     address = models.CharField(max_length=200)
     property_type = models.CharField(max_length=100)
+    
+class Platform_Manager(UserProfile):
+    pass
+    
+   
 
 class ServiceCategory(models.Model):
-    pass
+    name = models.CharField(max_length=100, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+    
 class CleaningListing(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -42,6 +52,7 @@ class CleaningListing(models.Model):
     date_end = models.DateTimeField()
     price = models.FloatField()
     status = models.CharField(max_length=20)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     
 class CleaningRequest(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE)

@@ -38,6 +38,9 @@
           <li class="nav-item me-4">
             <a class="nav-link" href="{% url 'cleaning_listings' %}">Cleaning Listing<i class="fa fa-users" aria-hidden="true"></i></a>
           </li>
+        {% elif user.role == 'platform manager' %}
+          <li class="nav-item me-4">
+            <a class="nav-link" href="{% url 'view_category' %}">Service Categories<i class="fa fa-users" aria-hidden="true"></i></a>
         {% endif %}
         <li class="nav-item me-4">
           <a class="nav-link" href="{% url 'logout' %}">Sign out<i class="fa fa-sign-out" aria-hidden="true"></i></a>

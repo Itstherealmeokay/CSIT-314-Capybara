@@ -14,4 +14,8 @@ urlpatterns = [
     path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
     path('cleaning_listings/', views.cleaning_listings, name='cleaning_listings'),
     path('cleaner/listings/create/', views.create_cleaning_listing, name='create_cleaning_listing'),
+    path('add_service_category/', views.add_service_category, name='add_service_category'),
+    path('view_category/', views.view_service_category, name='view_category'),
+    path('cleaner/listings/delete/<int:listing_id>/', views.delete_cleaning_listing, name='delete_cleaning_listing'),
 ]
+
