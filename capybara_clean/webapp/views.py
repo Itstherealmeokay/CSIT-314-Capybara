@@ -76,7 +76,7 @@ def dashboard(request):
         return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
         return render(request, 'webapp/dashboard_cleaner.html', {'user': user})
-    elif user.role == 'platform manager':
+    elif user.role == 'platform_manager':
         return render(request, 'webapp/dashboard_platformmanager.html', {'user': user})
     return HttpResponse(f"Unknown role {user}")
 
@@ -143,7 +143,7 @@ def delete_cleaning_listing(request, listing_id):
     return redirect('cleaning_listings')
 
 def add_service_category(request):
-    if request.user.role != 'platform manager':
+    if request.user.role != 'platform_manager':
         return redirect('dashboard')
     
     if request.method == 'POST':

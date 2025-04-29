@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='customuser',
             name='role',
-            field=models.CharField(choices=[('homeowner', 'Homeowner'), ('cleaner', 'Cleaner'), ('platform manager', 'Platform Manager')], max_length=50),
+            field=models.CharField(choices=[('homeowner', 'Homeowner'), ('cleaner', 'Cleaner'), ('platform_manager', 'Platform Manager')], max_length=50),
         ),
     ]
