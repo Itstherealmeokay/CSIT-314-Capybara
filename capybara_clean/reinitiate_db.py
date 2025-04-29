@@ -6,11 +6,11 @@ from django.contrib.auth import get_user_model
 # Set up Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "capybara_clean.settings")
 django.setup()
-data_file = 'D:\Coding Projects\For-Chingz\CSIT314\CSIT-314-Capybara\capybara_clean\initiate_db_data.json'
+data_file = r"C:\Users\Admin\Documents\CSIT-314-Capybara\capybara_clean\initiate_db_data.json"
 
 from webapp.models import *
 
-USER_FIELDS = ['username', 'password', 'email']
+USER_FIELDS = ['username', 'password', 'email_address']
 
 def register_users():
     with open(data_file, 'r') as f:

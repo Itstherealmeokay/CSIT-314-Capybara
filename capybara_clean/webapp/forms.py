@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
-from .models import CustomUser, UserProfile
+from .models import CustomUser, UserProfile, CleaningListing
 
 
 class CreateUserForm(UserCreationForm):
@@ -24,4 +24,15 @@ class LoginForm(AuthenticationForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['full_name', 'address', 'phone_number']
+        fields = ['full_name', 'address', 'phone_number', 'email_address']
+        
+
+
+class CleaningListingForm(forms.ModelForm):
+    class Meta:
+        model = CleaningListing
+        fields = ['name', 'description', 'service_category', 'date_start', 'date_end', 'price']
+        widgets = {
+            'date_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'date_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }

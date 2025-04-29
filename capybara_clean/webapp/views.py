@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 
-from .forms import CreateUserForm, LoginForm, UserProfileForm
-from .models import UserProfile, Homeowner, Cleaner
+from .forms import CreateUserForm, LoginForm, UserProfileForm, CleaningListingForm
+from .models import UserProfile, Homeowner, Cleaner, CleaningListing
 
 
 def home(request):
@@ -102,6 +102,30 @@ def browse_cleaners(request):
         cleaners = Cleaner.objects.filter(user__username__icontains=query)
 
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
+
+def cleaning_listings(request):
+    if request.user.role != 'cleaner':
+        return redirect('dashboard')  # prevent unauthorized access
+
+    listings = CleaningListing.objects.all()
+    return render(request, 'webapp/cleaning_listings.html', {'listings': listings})
+
+@login_required
+def create_cleaning_listing(request):
+    if request.user.role != 'cleaner':
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = CleaningListingForm(request.POST)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.status = 'active'  # or set default
+            listing.save()
+            return redirect('webapp/cleaning_listings.html')
+    else:
+        form = CleaningListingForm()
+
+    return render(request, 'webapp/create_cleaning_listing.html', {'form': form})
 
 def logout(request):
     auth.logout(request)

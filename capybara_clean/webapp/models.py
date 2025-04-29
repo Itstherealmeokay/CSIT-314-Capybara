@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
+    email_address = models.CharField(max_length=200, null=True , blank=True)
     address = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=20)
     
@@ -30,6 +31,17 @@ class Cleaner(UserProfile):
 class Property(models.Model):
     address = models.CharField(max_length=200)
     property_type = models.CharField(max_length=100)
+
+class ServiceCategory(models.Model):
+    pass
+class CleaningListing(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    service_category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
+    date_start = models.DateTimeField()
+    date_end = models.DateTimeField()
+    price = models.FloatField()
+    status = models.CharField(max_length=20)
     
 class CleaningRequest(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
