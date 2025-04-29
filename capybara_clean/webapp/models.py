@@ -29,13 +29,13 @@ class Homeowner(UserProfile):
 class Cleaner(UserProfile):
     cleaning_requests = models.ManyToManyField('CleaningRequest', related_name='cleaners', blank=True)
 
+class PlatformManager(UserProfile):
+    pass
+
 class Property(models.Model):
     address = models.CharField(max_length=200)
     property_type = models.CharField(max_length=100)
     
-class Platform_Manager(UserProfile):
-    pass
-
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     

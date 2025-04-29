@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 
 
 from .forms import CreateUserForm, LoginForm, UserProfileForm, CleaningListingForm, ServiceCategoryForm
-from .models import UserProfile, Homeowner, Cleaner, CleaningListing, Platform_Manager, ServiceCategory  
+from .models import UserProfile, Homeowner, Cleaner, CleaningListing, PlatformManager, ServiceCategory  
 
 
 def home(request):
@@ -33,14 +33,12 @@ class RegisterView(View):
         elif role == 'cleaner':
             Cleaner.objects.create(user=user)
         elif role == 'platform_manager':
-            Platform_Manager.objects.create(user=user)
+            PlatformManager.objects.create(user=user)
         return redirect('login')
 
 def edit_profile(request):
     user = request.user
-    
     profile, created = UserProfile.objects.get_or_create(user=user)
-
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
@@ -54,6 +52,8 @@ def edit_profile(request):
 
 class LoginView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
         return render(request, 'webapp/login.html', {'form': LoginForm()})
 
     def post(self, request):
@@ -80,6 +80,7 @@ def dashboard(request):
         return render(request, 'webapp/dashboard_platformmanager.html', {'user': user})
     return HttpResponse(f"Unknown role {user}")
 
+@login_required(login_url='login')
 def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     return render(request, 'webapp/view_profile.html', {'profile': profile})
@@ -100,6 +101,7 @@ class CleanerProfile(LoginRequiredMixin, View):
         is_favourited = favourite_cleaners.contains(cleaner)
         return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
 
+@login_required(login_url='login')
 def browse_cleaners(request):
     query = request.GET.get('q')
     cleaners = Cleaner.objects.all()
@@ -110,6 +112,7 @@ def browse_cleaners(request):
 
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
+@login_required(login_url='login')
 def cleaning_listings(request):
     if request.user.role != 'cleaner':
         return redirect('dashboard')  # prevent unauthorized access
@@ -134,14 +137,13 @@ def create_cleaning_listing(request):
 
     return render(request, 'webapp/create_cleaning_listing.html', {'form': form})
 
-@login_required
+@login_required(login_url='login')
 def delete_cleaning_listing(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id) 
     listing.delete()
-
-   
     return redirect('cleaning_listings')
 
+@login_required(login_url='login')
 def add_service_category(request):
     if request.user.role != 'platform_manager':
         return redirect('dashboard')

@@ -10,7 +10,7 @@ data_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "initiate_d
 
 from webapp.models import *
 
-USER_FIELDS = ['username', 'password', 'email_address']
+USER_FIELDS = ['username', 'password', 'email']
 
 def register_users():
     with open(data_file, 'r') as f:
