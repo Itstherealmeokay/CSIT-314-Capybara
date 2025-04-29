@@ -35,8 +35,6 @@ class Property(models.Model):
     
 class Platform_Manager(UserProfile):
     pass
-    
-   
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
