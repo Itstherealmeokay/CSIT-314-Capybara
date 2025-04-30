@@ -1,17 +1,35 @@
 {% extends 'webapp/base.html' %}
 {% block content %}
 <div class="container mt-4">
-  <h2>{{ listing.name }}</h2>
-  <p><strong>Created By:</strong> {{ listing.owner.userprofile.full_name|default:listing.owner.username }}</p>
-  <p><strong>Description:</strong> {{ listing.description }}</p>
-  <p><strong>Service Category:</strong> {{ listing.service_category.name }}</p>
-  <p><strong>Start Date:</strong> {{ listing.date_start }}</p>
-  <p><strong>End Date:</strong> {{ listing.date_end }}</p>
-  <p><strong>Price:</strong> ${{ listing.price }}</p>
-  <p><strong>Status:</strong> {{ listing.status }}</p>
-{% if request.user == listing.owner %}
-    <a href="{% url 'delete_cleaning_listing' listing.id %}" class="btn btn-danger">Delete</a>
-{% endif %}
-  <a href="{% url 'cleaning_listings' %}" class="btn btn-secondary">Back to Listings</a>
+    <h2>{{ listing.name }}</h2>
+    <p><strong>Status:</strong> 
+        {% if listing.status|lower == 'active' %}
+            <span class="badge bg-success">{{ listing.status|capfirst }}</span>
+        {% else %}
+            <span class="badge bg-secondary">{{ listing.status|capfirst }}</span>
+        {% endif %}
+    </p>
+    <p><strong>Created By:</strong> {{ listing.owner.userprofile.full_name|default:listing.owner.username }}</p>
+    <p><strong>Service Category:</strong> {{ listing.service_category.name }}</p>
+    <p><strong>Start Date:</strong> {{ listing.date_start }}</p>
+    <p><strong>End Date:</strong> {{ listing.date_end }}</p>
+        <div class="mb-3">
+        <strong>Description:</strong>
+            <div class="border p-3 rounded bg-light">
+                {{ listing.description }}
+            </div>
+        </div>
+
+
+    <p><strong>Price:</strong> ${{ listing.price }}</p>
+
+  
+
+    <div class="mt-4">
+        {% if request.user == listing.owner %}
+            <a href="{% url 'delete_cleaning_listing' listing.id %}" class="btn btn-danger me-2">Delete</a>
+        {% endif %}
+        <a href="{% url 'cleaning_listings' %}" class="btn btn-secondary">Back to Listings</a>
+    </div>
 </div>
 {% endblock %}
