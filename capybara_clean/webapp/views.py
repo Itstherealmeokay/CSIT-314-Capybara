@@ -129,6 +129,7 @@ def create_cleaning_listing(request):
         form = CleaningListingForm(request.POST)
         if form.is_valid():
             listing = form.save(commit=False)
+            listing.owner = request.user
             listing.status = 'active'  # or set default
             listing.save()
             return redirect('cleaning_listings')
