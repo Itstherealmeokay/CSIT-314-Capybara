@@ -157,16 +157,23 @@ def add_service_category(request):
             else:
                 form.save()
                 messages.success(request, 'Service category added successfully.')
-                return redirect('dashboard')
+                return redirect('view_category')
             
     else:
         form = ServiceCategoryForm()
         
     return render(request, 'webapp/add_category.html', {'form': form})
 
+@login_required(login_url='login')
 def view_service_category(request):
     categories = ServiceCategory.objects.all()
     return render(request, 'webapp/view_category.html', {'categories': categories})
+
+@login_required(login_url='login')
+def delete_service_category(request, category_id):
+    category = get_object_or_404(ServiceCategory, id=category_id)
+    category.delete()
+    return redirect('view_category')
 
 def logout(request):
     auth.logout(request)

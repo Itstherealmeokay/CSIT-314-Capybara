@@ -10,6 +10,9 @@
   <ul>
     {% for category in categories %}
       <li>{{ category.name }}</li>
+      <a href="{% url 'delete_service_category' category.id %}">
+        <button>Delete</button>
+      </a>
     {% empty %}
       <li>No categories yet.</li>
     {% endfor %}
