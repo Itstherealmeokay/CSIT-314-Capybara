@@ -1,37 +1,42 @@
 {% extends 'webapp/base.html' %}
-
 {% block content %}
+
 <div class="container mt-5">
+  <!-- Header with action button -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>All Cleaning Listings</h2>
+    <h2 class="mb-0">🧹 All Cleaning Listings</h2>
     <a href="{% url 'create_cleaning_listing' %}" class="btn btn-success">+ Create New Listing</a>
   </div>
 
-  <div class="row">
-    {% for listing in listings %}
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">{{ listing.name }}</h5>
-            <p class="card-text">{{ listing.description|truncatewords:25 }}</p>
-            <p><strong>Created by:</strong> {{ listing.owner.userprofile.full_name }}</p>
-            <p class="card-text"><strong>Category:</strong> {{ listing.service_category.name }}</p>
-            <p class="card-text"><strong>Price:</strong> ${{ listing.price }}</p>
-            <p class="card-text"><strong>Start:</strong> {{ listing.date_start|date:"SHORT_DATETIME_FORMAT" }}</p>
-            <p class="card-text"><strong>End:</strong> {{ listing.date_end|date:"SHORT_DATETIME_FORMAT" }}</p>
-            <p class="card-text"><strong>Status:</strong> {{ listing.status|title }}</p>
-
-            <!-- Delete Button -->
-            {% if request.user == listing.owner %}
-            <a href="{% url 'delete_cleaning_listing' listing.id %}">Delete</a>
-          {% endif %}
-      
-          </div>
-        </div>
-      </div>
-    {% empty %}
-      <p>No listings found.</p>
-    {% endfor %}
+  <!-- Table with border and hover effect -->
+  <div class="table-responsive border rounded p-3 bg-white shadow-sm">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Created By</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for listing in listings %}
+        <tr>
+          <td>{{ listing.name }}</td>
+          <td>{{ listing.owner.userprofile.full_name|default:listing.owner.username }}</td>
+          <td>${{ listing.price }}</td>
+          <td>
+            <a href="{% url 'view_listing' listing.id %}" class="btn btn-info btn-sm">View Details</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">No listings available.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
+
 {% endblock %}

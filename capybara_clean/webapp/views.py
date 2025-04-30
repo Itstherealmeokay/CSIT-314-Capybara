@@ -120,6 +120,10 @@ def cleaning_listings(request):
     listings = CleaningListing.objects.all()
     return render(request, 'webapp/cleaning_listings.html', {'listings': listings})
 
+def view_listing(request, listing_id):
+    listing = get_object_or_404(CleaningListing, id=listing_id)
+    return render(request, 'webapp/view_listing.html', {'listing': listing})
+
 @login_required
 def create_cleaning_listing(request):
     if request.user.role != 'cleaner':

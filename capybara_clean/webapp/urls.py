@@ -18,5 +18,8 @@ urlpatterns = [
     path('view_category/', views.view_service_category, name='view_category'),
     path('cleaner/listings/delete/<int:listing_id>/', views.delete_cleaning_listing, name='delete_cleaning_listing'),
     path('delete_service_category/<int:category_id>/', views.delete_service_category, name='delete_service_category'),
+    path('listings/', views.cleaning_listings, name='cleaning_listings'),
+    path('listings/<int:listing_id>/', views.view_listing, name='view_listing'),
 ]
+
 
