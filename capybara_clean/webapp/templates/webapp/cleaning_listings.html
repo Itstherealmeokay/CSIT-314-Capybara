@@ -14,6 +14,7 @@
           <div class="card-body">
             <h5 class="card-title">{{ listing.name }}</h5>
             <p class="card-text">{{ listing.description|truncatewords:25 }}</p>
+            <p><strong>Created by:</strong> {{ listing.owner.userprofile.full_name }}</p>
             <p class="card-text"><strong>Category:</strong> {{ listing.service_category.name }}</p>
             <p class="card-text"><strong>Price:</strong> ${{ listing.price }}</p>
             <p class="card-text"><strong>Start:</strong> {{ listing.date_start|date:"SHORT_DATETIME_FORMAT" }}</p>
@@ -21,11 +22,9 @@
             <p class="card-text"><strong>Status:</strong> {{ listing.status|title }}</p>
 
             <!-- Delete Button -->
-            <a href="{% url 'delete_cleaning_listing' listing.id %}" 
-                class="btn btn-danger" 
-                onclick="return confirm('Are you sure you want to delete this listing?');">
-              Delete Listing
-            </a>
+            {% if request.user == listing.owner %}
+            <a href="{% url 'delete_cleaning_listing' listing.id %}">Delete</a>
+          {% endif %}
       
           </div>
         </div>
