@@ -21,7 +21,7 @@
             {{ listing.description }}
         </div>
     </div>
-    <p><strong>Price:</strong> ${{ listing.price }}</p>
+    <p><strong>Price:</strong> ${{ listing.price|floatformat:2 }}</p>
 
     <div class="mt-4">
         {% if belongs_to_user %}
