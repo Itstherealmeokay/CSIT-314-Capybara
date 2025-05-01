@@ -27,7 +27,7 @@
         {% if belongs_to_user %}
             <a href="{% url 'delete_cleaning_listing' listing.id %}" class="btn btn-danger me-2">Delete</a>
         {% endif %}
-        <a href="{% url 'cleaning_listings' %}" class="btn btn-secondary">Back to Listings</a>
+        <a href="{% url 'browse_cleaning_listings' %}" class="btn btn-secondary">Back to Listings</a>
     </div>
 </div>
 {% endblock %}

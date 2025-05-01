@@ -117,12 +117,12 @@ def browse_cleaners(request):
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
 @login_required(login_url='login')
-def cleaning_listings(request):
+def browse_cleaning_listings(request):
     if request.user.role != 'cleaner':
         return redirect('dashboard')  # prevent unauthorized access
 
     listings = CleaningListing.objects.all()
-    return render(request, 'webapp/cleaning_listings.html', {'listings': listings})
+    return render(request, 'webapp/browse_cleaning_listings.html', {'listings': listings})
 
 @login_required(login_url='login')
 def view_listing(request, listing_id):
@@ -144,7 +144,7 @@ def create_cleaning_listing(request):
             listing = form.save(commit=False)
             listing.cleaner = Cleaner.objects.get(user=request.user)
             listing.save()
-            return redirect('cleaning_listings')
+            return redirect('browse_cleaning_listings')
     else:
         form = CleaningListingForm()
 
@@ -154,7 +154,7 @@ def create_cleaning_listing(request):
 def delete_cleaning_listing(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id) 
     listing.delete()
-    return redirect('cleaning_listings')
+    return redirect('browse_cleaning_listings')
 
 @login_required(login_url='login')
 def add_service_category(request):
