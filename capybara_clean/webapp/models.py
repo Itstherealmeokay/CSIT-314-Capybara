@@ -23,7 +23,6 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
     
 class Homeowner(UserProfile):
-    properties = models.ManyToManyField('Property', related_name='homeowners', blank=True)
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)
     favourite_listings = models.ManyToManyField('CleaningListing', related_name='favourite_listings', blank=True)
 
@@ -34,8 +33,9 @@ class PlatformManager(UserProfile):
     pass
 
 class Property(models.Model):
+    name = models.CharField(max_length=100)
+    homeowner = models.ForeignKey(Homeowner, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=200)
-    property_type = models.CharField(max_length=100)
     
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)

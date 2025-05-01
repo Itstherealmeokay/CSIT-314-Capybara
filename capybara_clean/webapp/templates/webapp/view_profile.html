@@ -12,4 +12,37 @@
 
   <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">Edit Profile</a>
 </div>
+{% if user.role == 'homeowner' %}
+  <div class="container bg-light shadow-md, p-5">
+    <h2>My Properties</h2>
+    <hr>
+    <a href="{% url 'property_create' %}" class="btn btn-primary mt-3">Add Property</a>
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for property in properties %}
+        <tr>
+          <td>{{ property.name }}</td>
+          <td>{{ property.address }}</td>
+          <td>
+            <div class="d-flex justify-content-end">
+              <a href="{% url 'property_update' property.id %}" class="btn me-2 btn-info btn-sm">Update</a>
+              <a href="{% url 'property_delete' property.id %}" class="btn me-2 btn-danger btn-sm">Delete</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">No properties registered.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
 {% endblock %}

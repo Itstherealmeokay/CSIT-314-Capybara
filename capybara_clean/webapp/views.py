@@ -9,8 +9,8 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
 
-from .forms import CreateUserForm, LoginForm, UserProfileForm, CleaningListingForm, ServiceCategoryForm
-from .models import UserProfile, Homeowner, Cleaner, CleaningListing, PlatformManager, ServiceCategory  
+from .forms import *
+from .models import *
 
 
 def home(request):
@@ -43,7 +43,7 @@ def edit_profile(request):
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('dashboard')
+            return redirect('view_profile')
     else:
         form = UserProfileForm(instance=profile)
 
@@ -87,7 +87,11 @@ def dashboard(request):
 @login_required(login_url='login')
 def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'webapp/view_profile.html', {'profile': profile})
+    data = {
+        'profile': profile,
+        'properties': Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user)),
+    }
+    return render(request, 'webapp/view_profile.html', data)
 
 class CleanerProfile(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -106,6 +110,47 @@ class CleanerProfile(LoginRequiredMixin, View):
         return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
 
 @login_required(login_url='login')
+def property_create(request):
+    if request.user.role != 'homeowner':
+        return redirect('view_profile')
+
+    if request.method == 'POST':
+        form = PropertyForm(request.POST)
+        if form.is_valid():
+            property = form.save(commit=False)
+            property.homeowner = Homeowner.objects.get(user=request.user)
+            property.save()
+            return redirect('view_profile')
+    else:
+        form = PropertyForm()
+
+    return render(request, 'webapp/property_create.html', {'form': form})
+
+@login_required(login_url='login')
+def property_update(request, property_id):
+    property = Property.objects.get(id=property_id)
+    if property.homeowner.user != request.user:
+        return redirect('view_profile')
+    
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, instance=property)
+        if form.is_valid():
+            form.save()
+            return redirect('view_profile')
+    else:
+        form = PropertyForm(instance=property)
+
+    return render(request, 'webapp/property_update.html', {'form': form})
+
+@login_required(login_url='login')
+def property_delete(request, property_id):
+    property = Property.objects.get(id=property_id)
+    if property.homeowner.user != request.user:
+        return redirect('view_profile')
+    property.delete()
+    return redirect('view_profile')
+
+@login_required(login_url='login')
 def browse_cleaners(request):
     query = request.GET.get('q')
     cleaners = Cleaner.objects.all()
@@ -118,7 +163,7 @@ def browse_cleaners(request):
 
 @login_required(login_url='login')
 def cleaning_listings_browse(request):
-    if request.user.role != 'cleaner':
+    if request.user.role not in ('homeowner', 'cleaner'):
         return redirect('dashboard')  # prevent unauthorized access
 
     listings = CleaningListing.objects.all()
@@ -133,7 +178,7 @@ def cleaning_listing_view(request, listing_id):
     }
     return render(request, 'webapp/cleaning_listing_view.html', data)
 
-@login_required
+@login_required(login_url='login')
 def cleaning_listing_create(request):
     if request.user.role != 'cleaner':
         return redirect('dashboard')
@@ -149,6 +194,27 @@ def cleaning_listing_create(request):
         form = CleaningListingForm()
 
     return render(request, 'webapp/cleaning_listing_create.html', {'form': form})
+
+@login_required(login_url='login')
+def cleaning_listing_update(request, listing_id):
+    listing = get_object_or_404(CleaningListing, id=listing_id)
+    if request.method == 'POST':
+        form = CleaningListingForm(request.POST, instance=listing)
+        if form.is_valid():
+            form.save()
+            return redirect('cleaning_listings_browse')
+    else:
+        form = CleaningListingForm(instance=listing)
+
+    return render(request, 'webapp/cleaning_listing_update.html', {'form': form})
+
+# @login_required(login_url='login')
+# def cleaning_listing_apply(request, listing_id):
+#     if request.user.role != 'homeowner':
+#         return redirect('cleaning_listings_view', listing_id)
+#     if request.method == 'POST':
+#         pass
+#     return render(request, 'webapp/cleaning_listing_apply.html', {'listing_id': listing_id})
 
 @login_required(login_url='login')
 def cleaning_listing_delete(request, listing_id):

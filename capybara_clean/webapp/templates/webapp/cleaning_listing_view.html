@@ -25,7 +25,13 @@
 
     <div class="mt-4">
         {% if belongs_to_user %}
+            <a href="{% url 'cleaning_listing_update' listing.id %}" class="btn btn-warning me-2">Update</a>
             <a href="{% url 'cleaning_listing_delete' listing.id %}" class="btn btn-danger me-2">Delete</a>
+        {% endif %}
+        {% if user.role == 'homeowner' and listing.status == 'open' %}
+            <!-- <a href="{% url 'cleaning_listing_view' listing.id %}" class="btn btn-primary">Apply</a> -->
+            <a class="btn btn-success me-2">Apply</a>
+            <a class="btn btn-primary me-2">Add to favourites</a>
         {% endif %}
         <a href="{% url 'cleaning_listings_browse' %}" class="btn btn-secondary">Back to Listings</a>
     </div>

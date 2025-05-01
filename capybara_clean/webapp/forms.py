@@ -1,9 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
-from .models import CustomUser, UserProfile, CleaningListing, ServiceCategory
+from .models import *
 
 
 class CreateUserForm(UserCreationForm):
@@ -25,14 +24,22 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['full_name', 'address', 'phone_number']
-        
 
+class PropertyForm(forms.ModelForm):
+    class Meta:
+        model = Property
+        fields = ['name', 'address']
 
 class CleaningListingForm(forms.ModelForm):
     class Meta:
         model = CleaningListing
         fields = ['name', 'description', 'service_category', 'price']
         
+class CleaningRequestForm(forms.ModelForm):
+    class Meta:
+        model = CleaningRequest
+        fields = ['property', 'request_date']
+
 class ServiceCategoryForm(forms.ModelForm):
     class Meta:
         model = ServiceCategory
