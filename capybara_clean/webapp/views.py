@@ -73,7 +73,7 @@ def dashboard(request):
     if user.is_staff:
         return redirect('/admin/')
     elif user.role == 'homeowner':
-        return render(request, 'webapp/dashboard_homeowner.html', {'user': user}, {'listings': listing})
+        return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
         listings = CleaningListing.objects.all()
         return render(request, 'webapp/dashboard_cleaner.html', {
