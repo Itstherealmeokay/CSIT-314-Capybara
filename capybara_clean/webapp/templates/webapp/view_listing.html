@@ -9,24 +9,22 @@
             <span class="badge bg-secondary">{{ listing.status|capfirst }}</span>
         {% endif %}
     </p>
-    <p><strong>Created By:</strong> {{ listing.owner.userprofile.full_name|default:listing.owner.username }}</p>
+    <p><strong>Created By:</strong> {{ listing.cleaner.full_name }}</p>
     <p><strong>Service Category:</strong> {{ listing.service_category.name }}</p>
-    <p><strong>Start Date:</strong> {{ listing.date_start }}</p>
-    <p><strong>End Date:</strong> {{ listing.date_end }}</p>
-        <div class="mb-3">
+    <p><strong>Date Posted:</strong> {{ listing.date_created }}</p>
+    {% if listing.date_closed %}
+        <p><strong>Date Closed:</strong> {{ listing.date_closed }}</p>
+    {% endif %}
+    <div class="mb-3">
         <strong>Description:</strong>
-            <div class="border p-3 rounded bg-light">
-                {{ listing.description }}
-            </div>
+        <div class="border p-3 rounded bg-light">
+            {{ listing.description }}
         </div>
-
-
+    </div>
     <p><strong>Price:</strong> ${{ listing.price }}</p>
 
-  
-
     <div class="mt-4">
-        {% if request.user == listing.owner %}
+        {% if belongs_to_user %}
             <a href="{% url 'delete_cleaning_listing' listing.id %}" class="btn btn-danger me-2">Delete</a>
         {% endif %}
         <a href="{% url 'cleaning_listings' %}" class="btn btn-secondary">Back to Listings</a>

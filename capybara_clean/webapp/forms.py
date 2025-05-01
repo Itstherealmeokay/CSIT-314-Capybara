@@ -24,18 +24,14 @@ class LoginForm(AuthenticationForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['full_name', 'address', 'phone_number', 'email_address']
+        fields = ['full_name', 'address', 'phone_number']
         
 
 
 class CleaningListingForm(forms.ModelForm):
     class Meta:
         model = CleaningListing
-        fields = ['name', 'description', 'service_category', 'date_start', 'date_end', 'price']
-        widgets = {
-            'date_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'date_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
+        fields = ['name', 'description', 'service_category', 'price']
         
 class ServiceCategoryForm(forms.ModelForm):
     class Meta:

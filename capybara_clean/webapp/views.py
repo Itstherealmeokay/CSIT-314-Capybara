@@ -124,9 +124,14 @@ def cleaning_listings(request):
     listings = CleaningListing.objects.all()
     return render(request, 'webapp/cleaning_listings.html', {'listings': listings})
 
+@login_required(login_url='login')
 def view_listing(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id)
-    return render(request, 'webapp/view_listing.html', {'listing': listing})
+    data = {
+        'listing': listing,
+        'belongs_to_user': request.user == listing.cleaner.user
+    }
+    return render(request, 'webapp/view_listing.html', data)
 
 @login_required
 def create_cleaning_listing(request):
@@ -137,8 +142,7 @@ def create_cleaning_listing(request):
         form = CleaningListingForm(request.POST)
         if form.is_valid():
             listing = form.save(commit=False)
-            listing.owner = request.user
-            listing.status = 'active'  # or set default
+            listing.cleaner = Cleaner.objects.get(user=request.user)
             listing.save()
             return redirect('cleaning_listings')
     else:

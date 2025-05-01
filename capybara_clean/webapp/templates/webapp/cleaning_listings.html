@@ -23,7 +23,7 @@
         {% for listing in listings %}
         <tr>
           <td>{{ listing.name }}</td>
-          <td>{{ listing.owner.userprofile.full_name|default:listing.owner.username }}</td>
+          <td>{{ listing.cleaner.user.full_name }}</td>
           <td>${{ listing.price }}</td>
           <td>
             <a href="{% url 'view_listing' listing.id %}" class="btn btn-info btn-sm">View Details</a>

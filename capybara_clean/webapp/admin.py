@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Homeowner, Cleaner, Property, CleaningRequest, UserProfile
+from .models import *
 
 class CustomUserAdmin(UserAdmin):
     # Add the `role` field to both the edit and create forms in the admin
@@ -19,4 +19,12 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 
 # Register other models as usual
-admin.site.register([UserProfile, Homeowner, Cleaner, Property, CleaningRequest])
+admin.site.register([
+    UserProfile,
+    Homeowner,
+    Cleaner,
+    Property,
+    CleaningRequest,
+    ServiceCategory,
+    CleaningListing,
+])

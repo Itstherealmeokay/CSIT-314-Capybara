@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+import django.utils.timezone
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -15,7 +16,6 @@ class CustomUser(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
-    email_address = models.CharField(max_length=200, null=True , blank=True)
     address = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=20)
     
@@ -25,9 +25,10 @@ class UserProfile(models.Model):
 class Homeowner(UserProfile):
     properties = models.ManyToManyField('Property', related_name='homeowners', blank=True)
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)
+    favourite_listings = models.ManyToManyField('CleaningListing', related_name='favourite_listings', blank=True)
 
 class Cleaner(UserProfile):
-    cleaning_requests = models.ManyToManyField('CleaningRequest', related_name='cleaners', blank=True)
+    pass
 
 class PlatformManager(UserProfile):
     pass
@@ -41,21 +42,32 @@ class ServiceCategory(models.Model):
     
     def __str__(self):
         return self.name
-    
+
+class CleaningListingStatus(models.TextChoices):
+    OPEN = 'open'
+    CLOSED = 'closed'
+
 class CleaningListing(models.Model):
+    cleaner = models.ForeignKey(Cleaner, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    service_category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
-    date_start = models.DateTimeField()
-    date_end = models.DateTimeField()
+    service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True)
+    date_created = models.DateTimeField(default=django.utils.timezone.now)
+    date_closed = models.DateTimeField(null=True)
     price = models.FloatField()
-    status = models.CharField(max_length=20)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=CleaningListingStatus.choices, default=CleaningListingStatus.OPEN)
+    requests = models.ManyToManyField('CleaningRequest', related_name='cleaning_listings', blank=True)
     
+class CleaningRequestStatus(models.TextChoices):
+    PENDING_CLEANER_ACCEPT = 'pending_cleaner_accept'
+    PENDING_CLEANING = 'pending_cleaning'
+    PENDING_REVIEW = 'pending_review'
+    DECLINED = 'declined'
+    COMPLETED = 'completed'
+
 class CleaningRequest(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    cleaner = models.ForeignKey(Cleaner, on_delete=models.CASCADE)
+    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.SET_NULL, null=True)
+    property = models.ForeignKey(Property, on_delete=models.SET_NULL, null=True)
     request_date = models.DateTimeField()
-    description = models.TextField()
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=40, choices=CleaningRequestStatus.choices, default=CleaningRequestStatus.PENDING_CLEANER_ACCEPT)
 
