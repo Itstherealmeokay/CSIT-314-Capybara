@@ -15,10 +15,10 @@ urlpatterns = [
 
     path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
     path('cleaner/<int:pk>/', views.CleanerProfile.as_view(), name='cleaner_profile'),
-    path('browsecleaninglistings/', views.browse_cleaning_listings, name='browse_cleaning_listings'),
-    path('cleaner/listings/create/', views.create_cleaning_listing, name='create_cleaning_listing'),
-    path('cleaner/listings/<int:listing_id>/delete/', views.delete_cleaning_listing, name='delete_cleaning_listing'),
-    path('cleaner/listings/<int:listing_id>/', views.view_listing, name='view_listing'),
+    path('browsecleaninglistings/', views.cleaning_listings_browse, name='cleaning_listings_browse'),
+    path('cleaner/listings/create/', views.cleaning_listing_create, name='cleaning_listing_create'),
+    path('cleaner/listings/<int:listing_id>/', views.cleaning_listing_view, name='cleaning_listing_view'),
+    path('cleaner/listings/<int:listing_id>/delete/', views.cleaning_listing_delete, name='cleaning_listing_delete'),
 
     path('service_category/create/', views.service_category_create, name='service_category_create'),
     path('service_category/', views.service_category_view, name='service_category_view'),

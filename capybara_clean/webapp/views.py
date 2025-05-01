@@ -117,24 +117,24 @@ def browse_cleaners(request):
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
 @login_required(login_url='login')
-def browse_cleaning_listings(request):
+def cleaning_listings_browse(request):
     if request.user.role != 'cleaner':
         return redirect('dashboard')  # prevent unauthorized access
 
     listings = CleaningListing.objects.all()
-    return render(request, 'webapp/browse_cleaning_listings.html', {'listings': listings})
+    return render(request, 'webapp/cleaning_listings_browse.html', {'listings': listings})
 
 @login_required(login_url='login')
-def view_listing(request, listing_id):
+def cleaning_listing_view(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id)
     data = {
         'listing': listing,
         'belongs_to_user': request.user == listing.cleaner.user
     }
-    return render(request, 'webapp/view_listing.html', data)
+    return render(request, 'webapp/cleaning_listing_view.html', data)
 
 @login_required
-def create_cleaning_listing(request):
+def cleaning_listing_create(request):
     if request.user.role != 'cleaner':
         return redirect('dashboard')
 
@@ -144,17 +144,17 @@ def create_cleaning_listing(request):
             listing = form.save(commit=False)
             listing.cleaner = Cleaner.objects.get(user=request.user)
             listing.save()
-            return redirect('browse_cleaning_listings')
+            return redirect('cleaning_listings_browse')
     else:
         form = CleaningListingForm()
 
-    return render(request, 'webapp/create_cleaning_listing.html', {'form': form})
+    return render(request, 'webapp/cleaning_listing_create.html', {'form': form})
 
 @login_required(login_url='login')
-def delete_cleaning_listing(request, listing_id):
+def cleaning_listing_delete(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id) 
     listing.delete()
-    return redirect('browse_cleaning_listings')
+    return redirect('cleaning_listings_browse')
 
 @login_required(login_url='login')
 def service_category_create(request):
