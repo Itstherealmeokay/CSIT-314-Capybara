@@ -36,6 +36,9 @@ class Property(models.Model):
     name = models.CharField(max_length=100)
     homeowner = models.ForeignKey(Homeowner, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.name} - {self.address}'
     
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
@@ -56,7 +59,10 @@ class CleaningListing(models.Model):
     date_closed = models.DateTimeField(null=True)
     price = models.FloatField()
     status = models.CharField(max_length=20, choices=CleaningListingStatus.choices, default=CleaningListingStatus.OPEN)
-    requests = models.ManyToManyField('CleaningRequest', related_name='cleaning_listings', blank=True)
+    views = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.cleaner.full_name} - {self.service_category} [{self.price}] ({self.status})'
     
 class CleaningRequestStatus(models.TextChoices):
     PENDING_CLEANER_ACCEPT = 'pending_cleaner_accept'

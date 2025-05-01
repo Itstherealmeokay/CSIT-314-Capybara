@@ -75,10 +75,15 @@ def dashboard(request):
     elif user.role == 'homeowner':
         return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
     elif user.role == 'cleaner':
-        listings = CleaningListing.objects.all()
+        listings = CleaningListing.objects.filter(cleaner=Cleaner.objects.get(user=request.user))
+        listing_data = [{
+            'listing': listing,
+            'requests': CleaningRequest.objects.filter(cleaning_listing=listing),
+        } for listing in listings]
         return render(request, 'webapp/dashboard_cleaner.html', {
-        'user': user,
-        'listings': listings })
+            'user': user,
+            'listing_data': listing_data,
+        })
 
     elif user.role == 'platform_manager':
         return render(request, 'webapp/dashboard_platformmanager.html', {'user': user})
@@ -87,9 +92,12 @@ def dashboard(request):
 @login_required(login_url='login')
 def view_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    properties = None
+    if Homeowner.objects.filter(user=request.user).exists():
+        properties = Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user))
     data = {
         'profile': profile,
-        'properties': Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user)),
+        'properties': properties,
     }
     return render(request, 'webapp/view_profile.html', data)
 
@@ -172,6 +180,8 @@ def cleaning_listings_browse(request):
 @login_required(login_url='login')
 def cleaning_listing_view(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id)
+    listing.views += 1
+    listing.save()
     data = {
         'listing': listing,
         'belongs_to_user': request.user == listing.cleaner.user
@@ -208,13 +218,25 @@ def cleaning_listing_update(request, listing_id):
 
     return render(request, 'webapp/cleaning_listing_update.html', {'form': form})
 
-# @login_required(login_url='login')
-# def cleaning_listing_apply(request, listing_id):
-#     if request.user.role != 'homeowner':
-#         return redirect('cleaning_listings_view', listing_id)
-#     if request.method == 'POST':
-#         pass
-#     return render(request, 'webapp/cleaning_listing_apply.html', {'listing_id': listing_id})
+@login_required(login_url='login')
+def cleaning_listing_apply(request, listing_id):
+    if request.user.role != 'homeowner':
+        return redirect('cleaning_listings_view', listing_id)
+    
+    cleaning_listing = CleaningListing.objects.get(id=listing_id)
+    homeowner = Homeowner.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = CleaningRequestForm(request.POST, homeowner=homeowner)
+        if form.is_valid():
+            cleaning_request = form.save(commit=False)
+            cleaning_request.cleaning_listing = cleaning_listing
+            cleaning_request.save()
+            return redirect('cleaning_listings_browse')
+    data = {
+        'listing_id': listing_id,
+        'form': CleaningRequestForm(homeowner=homeowner)
+    }
+    return render(request, 'webapp/cleaning_listing_apply.html', data)
 
 @login_required(login_url='login')
 def cleaning_listing_delete(request, listing_id):

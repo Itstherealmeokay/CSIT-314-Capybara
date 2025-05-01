@@ -39,6 +39,14 @@ class CleaningRequestForm(forms.ModelForm):
     class Meta:
         model = CleaningRequest
         fields = ['property', 'request_date']
+        widgets = {
+            'request_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        homeowner = kwargs.pop('homeowner')  # Get the user from the view
+        super().__init__(*args, **kwargs)
+        self.fields['property'].queryset = Property.objects.filter(homeowner=homeowner)
 
 class ServiceCategoryForm(forms.ModelForm):
     class Meta:
