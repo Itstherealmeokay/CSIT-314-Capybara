@@ -23,6 +23,7 @@ admin.site.register([
     UserProfile,
     Homeowner,
     Cleaner,
+    PlatformManager,
     Property,
     CleaningRequest,
     ServiceCategory,

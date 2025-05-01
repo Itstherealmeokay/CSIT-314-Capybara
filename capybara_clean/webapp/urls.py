@@ -20,9 +20,9 @@ urlpatterns = [
     path('cleaner/listings/<int:listing_id>/delete/', views.delete_cleaning_listing, name='delete_cleaning_listing'),
     path('cleaner/listings/<int:listing_id>/', views.view_listing, name='view_listing'),
 
-    path('add_service_category/', views.add_service_category, name='add_service_category'),
-    path('view_category/', views.view_service_category, name='view_category'),
-    path('delete_service_category/<int:category_id>/', views.delete_service_category, name='delete_service_category'),
+    path('service_category/create/', views.service_category_create, name='service_category_create'),
+    path('service_category/', views.service_category_view, name='service_category_view'),
+    path('service_category/<int:category_id>/delete/', views.service_category_delete, name='service_category_delete'),
 ]
 
 

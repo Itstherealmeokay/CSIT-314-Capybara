@@ -9,6 +9,16 @@
             "phone_number": "123-456-7890"
         }
     ],
+    "platform_managers": [
+        {
+            "username": "Jix",
+            "password": "123",
+            "email": "Juxarius@example.com",
+            "full_name": "Jux",
+            "address": "123 Main St",
+            "phone_number": "123-456-7890"
+        }
+    ],
     "homeowners": [
         {
             "username": "Juxaxa",

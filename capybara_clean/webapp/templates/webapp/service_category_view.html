@@ -3,14 +3,14 @@
 {% block content %}
   <h1>Service Categories</h1>
 
-  <a href="{% url 'add_service_category' %}">
+  <a href="{% url 'service_category_create' %}">
     <button>Add Category</button>
   </a>
 
   <ul>
     {% for category in categories %}
       <li>{{ category.name }}</li>
-      <a href="{% url 'delete_service_category' category.id %}">
+      <a href="{% url 'service_category_delete' category.id %}">
         <button>Delete</button>
       </a>
     {% empty %}

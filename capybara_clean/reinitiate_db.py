@@ -27,6 +27,11 @@ def register_users():
             d1, d2 = break_apart(su)
             user = User.objects.create_superuser(role='admin', **d1)
             UserProfile.objects.create(user=user, **d2)
+    for pm in dev_users['platform_managers']:
+        if not User.objects.filter(username=pm['username']).exists():
+            d1, d2 = break_apart(pm)
+            user = User.objects.create_user(role='platform_manager', **d1)
+            PlatformManager.objects.create(user=user, **d2)
     for ho in dev_users['homeowners']:
         if not User.objects.filter(username=ho['username']).exists():
             d1, d2 = break_apart(ho)
