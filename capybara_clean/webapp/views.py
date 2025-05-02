@@ -70,36 +70,60 @@ class LoginView(View):
             return redirect('dashboard')
         return render(request, 'webapp/login.html', {'form': form})
 
+class Dashboard(LoginRequiredMixin, View):
+    login_url = 'login'
 
-@login_required(login_url='login')
-def dashboard(request):
-    user = request.user
-    if user.is_staff:
+    def get(self, request):
+        if request.user.is_staff:
+            return self.admin_dashboard(request)
+        if request.user.role == 'homeowner':
+            return self.homeowner_dashboard(request)
+        if request.user.role == 'cleaner':
+            return self.cleaner_dashboard(request)
+        if request.user.role == 'platform_manager':
+            return self.platform_manager_dashboard(request)
+        return redirect('login')
+    
+    def admin_dashboard(self, request):
         return redirect('/admin/')
-    elif user.role == 'homeowner':
+
+    def homeowner_dashboard(self, request):
         properties = Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user))
         property_data = [{
             'property': property,
             'requests': CleaningRequest.objects.filter(property=property),
         } for property in properties]
+        num_notifications = CleaningRequest.objects.filter(
+            property__homeowner__user=request.user
+        ).filter(
+            Q(status=CleaningRequestStatus.PENDING_REVIEW)
+        ).count()
         return render(request, 'webapp/dashboard_homeowner.html', {
-            'user': user,
+            'user': request.user,
             'property_data': property_data,
+            'num_notifications': num_notifications,
         })
-    elif user.role == 'cleaner':
+    
+    def cleaner_dashboard(self, request):
         listings = CleaningListing.objects.filter(cleaner=Cleaner.objects.get(user=request.user))
         listing_data = [{
             'listing': listing,
             'requests': CleaningRequest.objects.filter(cleaning_listing=listing),
         } for listing in listings]
+        num_notifications = CleaningRequest.objects.filter(
+            cleaning_listing__cleaner=Cleaner.objects.get(user=request.user)
+        ).filter(
+            Q(status=CleaningRequestStatus.PENDING_CLEANER_ACCEPT) |
+            Q(status=CleaningRequestStatus.PENDING_CLEANING)
+        ).count()
         return render(request, 'webapp/dashboard_cleaner.html', {
-            'user': user,
+            'user': request.user,
             'listing_data': listing_data,
+            'num_notifications': num_notifications,
         })
-
-    elif user.role == 'platform_manager':
-        return render(request, 'webapp/dashboard_platformmanager.html', {'user': user})
-    return HttpResponse(f"Unknown role {user}")
+    
+    def platform_manager_dashboard(self, request):
+        return render(request, 'webapp/dashboard_platformmanager.html', {'user': request.user})
 
 @login_required(login_url='login')
 def view_profile(request):
