@@ -16,6 +16,8 @@ from .models import *
 
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, 'webapp/index.html')
 
 class RegisterView(View):
@@ -199,9 +201,6 @@ def browse_cleaners(request):
         cleaners = paginator.page(1)
     except EmptyPage:
         cleaners = paginator.page(paginator.num_pages)
-
-    
-
 
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
