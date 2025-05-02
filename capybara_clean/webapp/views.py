@@ -245,6 +245,15 @@ def cleaning_listing_delete(request, listing_id):
     return redirect('cleaning_listings_browse')
 
 @login_required(login_url='login')
+def cleaning_request_accept(request, request_id):
+    cleaning_request = CleaningRequest.objects.get(id=request_id)
+    if cleaning_request.cleaning_listing.cleaner.user != request.user:
+        return redirect('dashboard')
+    cleaning_request.status = CleaningRequestStatus.PENDING_CLEANING
+    cleaning_request.save()
+    return redirect('dashboard')
+
+@login_required(login_url='login')
 def service_category_create(request):
     if request.user.role != 'platform_manager':
         return redirect('dashboard')

@@ -22,6 +22,8 @@ urlpatterns = [
     path('cleaner/listings/<int:listing_id>/delete/', views.cleaning_listing_delete, name='cleaning_listing_delete'),
     path('cleaner/listings/<int:listing_id>/apply/', views.cleaning_listing_apply, name='cleaning_listing_apply'),
 
+    path('cleaner/requests/<int:request_id>/accept/', views.cleaning_request_accept, name='cleaning_request_accept'),
+
     path('property/create/', views.property_create, name='property_create'),
     path('property/<int:property_id>/update', views.property_update, name='property_update'),
     path('property/<int:property_id>/delete', views.property_delete, name='property_delete'),
