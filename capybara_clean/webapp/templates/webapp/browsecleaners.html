@@ -3,25 +3,34 @@
 {%block content%}
 
 <h3>Browse Cleaners</h3>
-<div class="container-fluid">
-  <!-- Side-scrolling container -->
-  <div class="d-flex flex-nowrap overflow-auto py-2">
-    {% for cleaner in favourite_cleaners %}
-      <div class="card m-2" style="min-width: 120px; height: 120px;">
-        <div class="card-body position-relative">
-          <!-- Item content -->
-          <h2 class="card-title">{{ cleaner.full_name }}</h2>
-          
-          <!-- Removal form -->
-          <form method="DELETE" action="{% url 'browsecleaners' %}" 
-                class="position-absolute top-0 end-0 mt-1 me-1">
-            {% csrf_token %}
-            <button type="submit" class="btn-close" aria-label="Remove"></button>
-          </form>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+<div class="container-fluid mt-4">
+  <h4>Favourite Cleaners</h4>
+  {% if favourite_cleaners %}
+  <table class="table table-striped table-hover align-middle">
+    <thead>
+      <tr>
+      <th>Name</th>
+      <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cleaner in favourite_cleaners %}
+        <tr>
+        <td>{{ cleaner.full_name }}</td>
+        <td class="text-end">
+        <form method="POST" action="{% url 'browsecleaners' %}">
+        {% csrf_token %}
+        <input type="hidden" name="cleaner_id" value="{{ cleaner.id }}">
+        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+        </form>
+        </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No favourite cleaners yet.</p>
+  {% endif %}
 </div>
 <div class="container mt-5">
   <form method="get" class="mb-4 d-flex justify-content-center">
