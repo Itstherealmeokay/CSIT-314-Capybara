@@ -254,6 +254,24 @@ def cleaning_request_accept(request, request_id):
     return redirect('dashboard')
 
 @login_required(login_url='login')
+def cleaning_request_decline(request, request_id):
+    cleaning_request = CleaningRequest.objects.get(id=request_id)
+    if cleaning_request.cleaning_listing.cleaner.user != request.user:
+        return redirect('dashboard')
+    cleaning_request.status = CleaningRequestStatus.DECLINED
+    cleaning_request.save()
+    return redirect('dashboard')
+
+@login_required(login_url='login')
+def cleaning_request_completed(request, request_id):
+    cleaning_request = CleaningRequest.objects.get(id=request_id)
+    if cleaning_request.cleaning_listing.cleaner.user != request.user:
+        return redirect('dashboard')
+    cleaning_request.status = CleaningRequestStatus.PENDING_REVIEW
+    cleaning_request.save()
+    return redirect('dashboard')
+
+@login_required(login_url='login')
 def service_category_create(request):
     if request.user.role != 'platform_manager':
         return redirect('dashboard')

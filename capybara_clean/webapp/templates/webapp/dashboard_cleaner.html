@@ -44,14 +44,37 @@
                                     <tr>
                                         <td>{{ request.request_date }}</td>
                                         <td>{{ request.property.homeowner.full_name }}</td>
-                                        <td>{{ request.status }}</td>
                                         <td>
-                                            {% if request.status == "pending_cleaner_accept" %}
-                                                <form method="POST" action="{% url 'cleaning_request_accept' request.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
-                                                </form>
+                                            {% if request.status == 'pending_cleaner_accept' %}
+                                                <span class="badge bg-primary">Pending Cleaner Accept</span>
+                                            {% elif request.status == 'pending_cleaning' %}
+                                                <span class="badge bg-primary">Pending Cleaning</span>
+                                            {% elif request.status == 'declined' %}
+                                                <span class="badge bg-danger">Declined</span>
+                                            {% elif request.status == 'pending_review' %}
+                                                <span class="badge bg-secondary">Pending Review</span>
+                                            {% elif request.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if request.status == "pending_cleaner_accept" %}
+                                                    <form method="POST" action="{% url 'cleaning_request_accept' request.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                                    </form>
+                                                    <form method="POST" action="{% url 'cleaning_request_decline' request.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                                    </form>
+                                                {% elif request.status == "pending_cleaning" %}
+                                                    <form method="POST" action="{% url 'cleaning_request_completed' request.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-success btn-sm">Cleaning Completed</button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
