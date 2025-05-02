@@ -169,8 +169,16 @@ def property_delete(request, property_id):
 @login_required(login_url='login')
 def browse_cleaners(request):
     query = request.GET.get('q')
+    homeowner = Homeowner.objects.get(user=request.user)
     cleaners = Cleaner.objects.all()
     favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners.all()
+    
+    #remove from favourites
+    if request.method == 'POST':
+        cleaner_id = request.POST.get('cleaner_id')
+        cleaner = Cleaner.objects.get(id=cleaner_id)
+        homeowner.favourite_cleaners.remove(cleaner)
+        return redirect('browsecleaners')
 
     if query:
         query = query.strip()
