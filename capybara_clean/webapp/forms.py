@@ -48,6 +48,15 @@ class CleaningRequestForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['property'].queryset = Property.objects.filter(homeowner=homeowner)
 
+class CleaningRequestReviewForm(forms.ModelForm):
+    class Meta:
+        model = CleaningRequest
+        fields = ['rating', 'feedback']
+        widgets = {
+            'rating': forms.RadioSelect(choices=[(i, f'{i} ⭐') for i in range(1, 6)]),
+            'feedback': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your feedback...'}),
+        }
+
 class ServiceCategoryForm(forms.ModelForm):
     class Meta:
         model = ServiceCategory

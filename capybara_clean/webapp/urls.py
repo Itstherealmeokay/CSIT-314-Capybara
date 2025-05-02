@@ -25,6 +25,7 @@ urlpatterns = [
     path('cleaner/requests/<int:request_id>/accept/', views.cleaning_request_accept, name='cleaning_request_accept'),
     path('cleaner/requests/<int:request_id>/decline/', views.cleaning_request_decline, name='cleaning_request_decline'),
     path('cleaner/requests/<int:request_id>/completed/', views.cleaning_request_completed, name='cleaning_request_completed'),
+    path('cleaner/requests/<int:request_id>/review/', views.cleaning_request_review, name='cleaning_request_review'),
 
     path('property/create/', views.property_create, name='property_create'),
     path('property/<int:property_id>/update', views.property_update, name='property_update'),

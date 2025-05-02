@@ -73,7 +73,15 @@ def dashboard(request):
     if user.is_staff:
         return redirect('/admin/')
     elif user.role == 'homeowner':
-        return render(request, 'webapp/dashboard_homeowner.html', {'user': user})
+        properties = Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user))
+        property_data = [{
+            'property': property,
+            'requests': CleaningRequest.objects.filter(property=property),
+        } for property in properties]
+        return render(request, 'webapp/dashboard_homeowner.html', {
+            'user': user,
+            'property_data': property_data,
+        })
     elif user.role == 'cleaner':
         listings = CleaningListing.objects.filter(cleaner=Cleaner.objects.get(user=request.user))
         listing_data = [{
@@ -261,6 +269,25 @@ def cleaning_request_decline(request, request_id):
     cleaning_request.status = CleaningRequestStatus.DECLINED
     cleaning_request.save()
     return redirect('dashboard')
+
+@login_required(login_url='login')
+def cleaning_request_review(request, request_id):
+    cleaning_request = CleaningRequest.objects.get(id=request_id)
+    if cleaning_request.property.homeowner.user != request.user:
+        return redirect('dashboard')
+    form = CleaningRequestReviewForm()
+    if request.method == 'POST':
+        form = CleaningRequestReviewForm(request.POST, instance=cleaning_request)
+        if form.is_valid():
+            cleaning_request.status = CleaningRequestStatus.COMPLETED
+            cleaning_request.rating = form.cleaned_data['rating']
+            cleaning_request.feedback = form.cleaned_data['feedback']
+            cleaning_request.save()
+            return redirect('dashboard')
+    return render(request, 'webapp/cleaning_request_review.html', {
+        'form': form,
+        'cleaning_request': cleaning_request,
+    })
 
 @login_required(login_url='login')
 def cleaning_request_completed(request, request_id):

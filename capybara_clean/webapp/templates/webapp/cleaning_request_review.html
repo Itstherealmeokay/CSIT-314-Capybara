@@ -1,0 +1,25 @@
+{% extends 'webapp/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container mt-5">
+  <h2>You are reviewing...</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ cleaning_request.cleaning_listing.cleaner.full_name }}</h5>
+      <p class="card-text"><strong>Phone Number:</strong> {{ cleaning_request.cleaning_listing.cleaner.phone_number }}</p>
+    </div>
+  </div>
+  <h2 class="mt-4">For cleaning at...</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ cleaning_request.property.name }}</h5>
+      <p class="card-text"><strong>Phone Number:</strong> {{ cleaning_request.property.address }}</p>
+    </div>
+  </div>
+  <form class="mt-4" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary mt-5">Submit Review</button>
+  </form>
+</div>
+{% endblock %}

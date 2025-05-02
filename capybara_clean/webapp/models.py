@@ -33,8 +33,8 @@ class PlatformManager(UserProfile):
     pass
 
 class Property(models.Model):
-    name = models.CharField(max_length=100)
     homeowner = models.ForeignKey(Homeowner, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
 
     def __str__(self):
@@ -76,4 +76,6 @@ class CleaningRequest(models.Model):
     property = models.ForeignKey(Property, on_delete=models.SET_NULL, null=True)
     request_date = models.DateTimeField()
     status = models.CharField(max_length=40, choices=CleaningRequestStatus.choices, default=CleaningRequestStatus.PENDING_CLEANER_ACCEPT)
+    rating = models.IntegerField(null=True, blank=True)
+    feedback = models.TextField(null=True, blank=True)
 
