@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-
+from django.db.models import Q
 
 from .forms import *
 from .models import *
@@ -173,7 +173,15 @@ def browse_cleaners(request):
     favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners.all()
 
     if query:
-        cleaners = Cleaner.objects.filter(user__username__icontains=query)
+        query = query.strip()
+        cleaners = Cleaner.objects.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(full_name__icontains=query)  # optional if you create a full_name field or property
+    )
+
+    
+
 
     return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
 
