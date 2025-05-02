@@ -334,11 +334,19 @@ def cleaning_request_review(request, request_id):
             cleaning_request.rating = form.cleaned_data['rating']
             cleaning_request.feedback = form.cleaned_data['feedback']
             cleaning_request.save()
+            refresh_cleaner_rating(cleaning_request.cleaning_listing.cleaner)
             return redirect('dashboard')
     return render(request, 'webapp/cleaning_request_review.html', {
         'form': form,
         'cleaning_request': cleaning_request,
     })
+
+def refresh_cleaner_rating(cleaner):
+    all_requests = CleaningRequest.objects.filter(
+        Q(cleaning_listing__cleaner=cleaner) & Q(status=CleaningRequestStatus.COMPLETED)
+    )
+    cleaner.rating = sum([request.rating for request in all_requests]) / len(all_requests)
+    cleaner.save()
 
 @login_required(login_url='login')
 def cleaning_request_completed(request, request_id):

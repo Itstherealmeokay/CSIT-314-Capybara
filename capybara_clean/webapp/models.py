@@ -60,6 +60,7 @@ class CleaningListing(models.Model):
     price = models.FloatField()
     status = models.CharField(max_length=20, choices=CleaningListingStatus.choices, default=CleaningListingStatus.OPEN)
     views = models.IntegerField(default=0)
+    rating = models.FloatField(null=True, default=None)
 
     def __str__(self):
         return f'{self.cleaner.full_name} - {self.service_category} [{self.price}] ({self.status})'
