@@ -7,7 +7,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .forms import *
 from .models import *
@@ -185,8 +187,18 @@ def browse_cleaners(request):
         cleaners = Cleaner.objects.filter(
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
-            Q(full_name__icontains=query)  # optional if you create a full_name field or property
+            Q(full_name__icontains=query) 
     )
+        
+    paginator = Paginator(cleaners, 8)
+    page_number = request.GET.get('page')
+    
+    try:
+        cleaners = paginator.page(page_number)
+    except PageNotAnInteger:
+        cleaners = paginator.page(1)
+    except EmptyPage:
+        cleaners = paginator.page(paginator.num_pages)
 
     
 
