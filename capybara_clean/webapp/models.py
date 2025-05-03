@@ -11,7 +11,6 @@ class CustomUser(AbstractUser):
         ('platform_manager', 'Platform Manager'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
-    date_joined = models.DateTimeField(default=django.utils.timezone.now)
 
 #Profile
 
