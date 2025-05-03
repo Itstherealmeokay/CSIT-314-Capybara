@@ -1,19 +1,44 @@
 {% extends "webapp/base.html" %}
-
+{% load crispy_forms_tags %}
 {% block content %}
   <h2>Add Service Category</h2>
 
   {% if messages %}
     {% for message in messages %}
-      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-        {{ message }}
-      </div>
+      {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+      {% else %}
+        <div class="alert alert-success" role="alert">
+      {% endif %}
+          {{ message }}
+        </div>
     {% endfor %}
   {% endif %}
 
-  <form method="post">
+  <form method="post" class="mt-4">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Category</button>
+    <div class="card shadow-sm p-4">
+      <h4 class="mb-3">New Service Category</h4>
+      {{ form|crispy }}
+      <div class="text-end">
+        <br>
+        <button type="submit" class="btn btn-primary">Add Category</button>
+      </div>
+    </div>
   </form>
+  
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const alerts = document.querySelectorAll('.alert');
+
+    alerts.forEach(alert => {
+      setTimeout(() => {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+      }, 3000);
+    });
+  });
+</script>
 {% endblock %}
