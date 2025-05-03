@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import django.utils.timezone
+from datetime import datetime
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -10,6 +11,7 @@ class CustomUser(AbstractUser):
         ('platform_manager', 'Platform Manager'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
+    date_joined = models.DateTimeField(default=django.utils.timezone.now)
 
 #Profile
 

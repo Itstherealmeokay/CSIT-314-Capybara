@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from datetime import datetime
 from .forms import *
 from .models import *
 
@@ -123,7 +123,22 @@ class Dashboard(LoginRequiredMixin, View):
         })
     
     def platform_manager_dashboard(self, request):
-        return render(request, 'webapp/dashboard_platformmanager.html', {'user': request.user})
+        today = datetime.now().date()
+        start_of_month = today.replace(day=1)
+        start_of_year = today.replace(month=1, day=1)
+        
+        daily_registrations = CustomUser.objects.filter(date_joined__date=today).count()
+        monthly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_month, today]).count()
+        yearly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_year, today]).count()
+        
+        data = {
+            'user': request.user,
+            'daily_registrations': daily_registrations,
+            'monthly_registrations': monthly_registrations,
+            'yearly_registrations': yearly_registrations,
+        }
+        
+        return render(request, 'webapp/dashboard_platformmanager.html', data)
 
 @login_required(login_url='login')
 def view_profile(request):
@@ -389,6 +404,7 @@ def service_category_delete(request, category_id):
     category.delete()
     return redirect('service_category_view')
 
+    
 def logout(request):
     auth.logout(request)
     return redirect('login')
