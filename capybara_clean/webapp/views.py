@@ -131,11 +131,14 @@ class Dashboard(LoginRequiredMixin, View):
         monthly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_month, today]).count()
         yearly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_year, today]).count()
         
+        new_users = CustomUser.objects.order_by('-date_joined')[:3]
+        
         data = {
             'user': request.user,
             'daily_registrations': daily_registrations,
             'monthly_registrations': monthly_registrations,
             'yearly_registrations': yearly_registrations,
+            'new_users': new_users
         }
         
         return render(request, 'webapp/dashboard_platformmanager.html', data)
