@@ -127,18 +127,65 @@ class Dashboard(LoginRequiredMixin, View):
         start_of_month = today.replace(day=1)
         start_of_year = today.replace(month=1, day=1)
         
-        daily_registrations = CustomUser.objects.filter(date_joined__date=today).count()
-        monthly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_month, today]).count()
-        yearly_registrations = CustomUser.objects.filter(date_joined__date__range=[start_of_year, today]).count()
-        
-        new_users = CustomUser.objects.order_by('-date_joined')[:3]
+        daily_cleaner_stats = [{
+            'cleaner': cleaner,
+            'num_requests': CleaningRequest.objects.filter(
+                Q(request_date__date=today) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+            'views': CleaningListingView.objects.filter(
+                Q(date_viewed__date=today) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+        } for cleaner in Cleaner.objects.all()]
+        monthly_cleaner_stats = [{
+            'cleaner': cleaner,
+            'num_requests': CleaningRequest.objects.filter(
+                Q(request_date__date__gte=start_of_month) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+            'views': CleaningListingView.objects.filter(
+                Q(date_viewed__date__gte=start_of_month) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+        } for cleaner in Cleaner.objects.all()]
+        yearly_cleaner_stats = [{
+            'cleaner': cleaner,
+            'num_requests': CleaningRequest.objects.filter(
+                Q(request_date__date__gte=start_of_year) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+            'views': CleaningListingView.objects.filter(
+                Q(date_viewed__date__gte=start_of_year) & Q(cleaning_listing__cleaner=cleaner)
+            ).count(),
+        } for cleaner in Cleaner.objects.all()]
         
         data = {
             'user': request.user,
-            'daily_registrations': daily_registrations,
-            'monthly_registrations': monthly_registrations,
-            'yearly_registrations': yearly_registrations,
-            'new_users': new_users
+            'new_users': CustomUser.objects.order_by('-date_joined')[:3],
+            'overall_stats': {
+                'cleaner': {
+                    'users': Cleaner.objects.count(),
+                    'listings': CleaningListing.objects.count(),
+                    'requests': CleaningRequest.objects.count(),
+                },
+                'homeowner': {
+                    'users': Homeowner.objects.count(),
+                    'properties': Property.objects.count(),
+                },
+            },
+            'reports': {
+                'daily': {
+                    'registrations': CustomUser.objects.filter(date_joined__date=today).count(),
+                    'top_3_viewed': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['views'])[-3:],
+                    'top_3_requested': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['num_requests'])[-3:],
+                },
+                'monthly': {
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_month).count(),
+                    'top_3_viewed': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['views'])[-3:],
+                    'top_3_requested': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'])[-3:],
+                },
+                'yearly': {
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_year).count(),
+                    'top_3_viewed': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['views'])[-3:],
+                    'top_3_requested': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'])[-3:],
+                },
+            },
         }
         
         return render(request, 'webapp/dashboard_platformmanager.html', data)

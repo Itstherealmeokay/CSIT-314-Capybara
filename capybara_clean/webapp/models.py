@@ -60,11 +60,15 @@ class CleaningListing(models.Model):
     date_closed = models.DateTimeField(null=True)
     price = models.FloatField()
     status = models.CharField(max_length=20, choices=CleaningListingStatus.choices, default=CleaningListingStatus.OPEN)
-    views = models.IntegerField(default=0)
     rating = models.FloatField(null=True, default=None)
 
     def __str__(self):
         return f'{self.cleaner.full_name} - {self.service_category} [{self.price}] ({self.status})'
+    
+class CleaningListingView(models.Model):
+    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
+    date_viewed = models.DateTimeField(default=django.utils.timezone.now)
+    homeowner = models.ForeignKey(Homeowner, on_delete=models.SET_NULL, null=True)
     
 class CleaningRequestStatus(models.TextChoices):
     PENDING_CLEANER_ACCEPT = 'pending_cleaner_accept'

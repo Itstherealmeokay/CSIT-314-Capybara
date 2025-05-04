@@ -3,51 +3,73 @@
 {%block content%}
 <h3> Welcome to Platform Manager Dashboard, {{ user }}</h3>
 
-<h3 class="mt-4">Registrations Overview</h3>
-<div class="row">
-  <div class="col-md-4">
+<h3 class="mt-4">Overall User Statistics</h3>
+<div class="d-flex flex-wrap gap-3">
+  <div class="flex-fill">
     <div class="card border-success shadow-sm p-3 mb-4">
-      <h5 class="text-success">Daily</h5>
-      <p><strong>Registrations:</strong> {{ daily_registrations }}</p>
+      <h5 class="text-success">Cleaners</h5>
+      <p class="mb-0"><strong>Users: </strong>{{ overall_stats.cleaner.users }}</p>
+      <p class="mb-0"><strong>Listings: </strong>{{ overall_stats.cleaner.listings }}</p>
+      <p class="mb-0"><strong>Requests: </strong>{{ overall_stats.cleaner.requests }}</p>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="flex-fill">
     <div class="card border-primary shadow-sm p-3 mb-4">
-      <h5 class="text-primary">Monthly</h5>
-      <p><strong>Registrations:</strong> {{ monthly_registrations }}</p>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card border-warning shadow-sm p-3 mb-4">
-      <h5 class="text-warning">Yearly</h5>
-      <p><strong>Registrations:</strong> {{ yearly_registrations }}</p>
+      <h5 class="text-primary">Homeowners</h5>
+      <p class="mb-0"><strong>Users: </strong>{{ overall_stats.homeowner.users }}</p>
+      <p class="mb-0"><strong>Properties: </strong>{{ overall_stats.homeowner.properties }}</p>
     </div>
   </div>
 </div>
 
-<h3 class="mt-4">New Users</h3>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Username</th>
-      <th>Role</th>
-      <th>Joined On</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for user in new_users %}
-    <tr>
-      <td>{{ user.username }}</td>
-      <td>{{ user.role }}</td>
-      <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="d-flex flex-wrap">
+  <h3 class="mt-4">New Users</h3>
+  <table class="table table-striped mb-4">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Joined On</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in new_users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.role }}</td>
+        <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
+<div class="mt-4">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="daily-tab" data-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">Daily</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="monthly-tab" data-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="false">Monthly</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="yearly-tab" data-toggle="tab" href="#yearly" role="tab" aria-controls="yearly" aria-selected="false">Yearly</a>
+    </li>
+  </ul>
 
-
-
-
+  <!-- Tab content -->
+  <div class="tab-content mt-3" id="reportTabsContent">
+    <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
+      {% include "webapp/widget_reports.html" with period="Daily" report=reports.daily %}
+    </div>
+    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+      {% include "webapp/widget_reports.html" with period="Monthly" report=reports.monthly %}
+    </div>
+    <div class="tab-pane fade" id="yearly" role="tabpanel" aria-labelledby="yearly-tab">
+      {% include "webapp/widget_reports.html" with period="Yearly" report=reports.yearly %}
+    </div>
+  </div>
+</div>
 
 {%endblock%}

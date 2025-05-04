@@ -1,0 +1,51 @@
+<h4 class="mt-4">Registrations Overview</h4>
+<div class="card border-success shadow-sm p-3 mb-4">
+<h5 class="text-success">{{ period }}</h5>
+<p><strong>Registrations:</strong> {{ report.registrations }}</p>
+</div>
+<div class="d-flex flex-wrap gap-3">
+<div class="flex-fill">
+    <h5 class="mt-4">Top 3 Viewed Cleaners</h5>
+    <table class="table table-striped mb-4">
+    <thead>
+        <tr>
+        <th>Username</th>
+        <th>Views</th>
+        <th>Requests</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in report.top_3_viewed %}
+        <tr>
+        <!-- MAKE THIS DATA ACCURATE -->
+        <td>{{ data.cleaner.user.username }}</td>
+        <td>{{ data.views }}</td>
+        <td>{{ data.num_requests }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+<div class="flex-fill">
+    <h5 class="mt-4">Top 3 Rated Cleaners</h5>
+    <table class="table table-striped mb-4">
+    <thead>
+        <tr>
+        <th>Username</th>
+        <th>Views</th>
+        <th>Requests</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in report.top_3_requested %}
+        <tr>
+        <!-- MAKE THIS DATA ACCURATE -->
+        <td>{{ data.cleaner.user.username }}</td>
+        <td>{{ data.views }}</td>
+        <td>{{ data.num_requests }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+</div>
