@@ -17,7 +17,6 @@
     <tbody>
         {% for data in report.top_3_viewed %}
         <tr>
-        <!-- MAKE THIS DATA ACCURATE -->
         <td>{{ data.cleaner.user.username }}</td>
         <td>{{ data.views }}</td>
         <td>{{ data.num_requests }}</td>
@@ -27,7 +26,7 @@
     </table>
 </div>
 <div class="flex-fill">
-    <h5 class="mt-4">Top 3 Rated Cleaners</h5>
+    <h5 class="mt-4">Top 3 Requested Cleaners</h5>
     <table class="table table-striped mb-4">
     <thead>
         <tr>
@@ -37,9 +36,8 @@
         </tr>
     </thead>
     <tbody>
-        {% for user in report.top_3_requested %}
+        {% for data in report.top_3_requested %}
         <tr>
-        <!-- MAKE THIS DATA ACCURATE -->
         <td>{{ data.cleaner.user.username }}</td>
         <td>{{ data.views }}</td>
         <td>{{ data.num_requests }}</td>

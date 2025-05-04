@@ -28,4 +28,5 @@ admin.site.register([
     CleaningRequest,
     ServiceCategory,
     CleaningListing,
+    CleaningListingView,
 ])
