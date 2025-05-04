@@ -85,3 +85,6 @@ class CleaningRequest(models.Model):
     rating = models.IntegerField(null=True, blank=True)
     feedback = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return f'{self.cleaning_listing.name} on {self.property.address} - {self.status}'
+

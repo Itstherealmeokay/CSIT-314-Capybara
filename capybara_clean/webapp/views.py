@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.db.models import Q, Value
+from django.db.models import Q, Value, Avg
 from django.db.models.functions import Concat
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
@@ -282,14 +282,30 @@ def cleaning_listings_browse(request):
     if request.user.role not in ('homeowner', 'cleaner'):
         return redirect('dashboard')  # prevent unauthorized access
 
-    listings = CleaningListing.objects.all()
-    return render(request, 'webapp/cleaning_listings_browse.html', {'listings': listings})
+    if request.method == 'GET' and request.GET.get('q'):
+        query = request.GET.get('q').strip()
+        listings = CleaningListing.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+    else:
+        listings = CleaningListing.objects.all()
+    data = [
+        {
+            'listing': listing,
+            'views': CleaningListingView.objects.filter(cleaning_listing=listing).count(),
+            'rating': CleaningRequest.objects.filter(cleaning_listing=listing).aggregate(Avg('rating'))['rating__avg'],
+        }
+        for listing in listings
+    ]
+    return render(request, 'webapp/cleaning_listings_browse.html', {'data': data, 'query': request.GET.get('q')})
 
 @login_required(login_url='login')
 def cleaning_listing_view(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id)
-    new_view = CleaningListingView.objects.create(cleaning_listing=listing, homeowner=Homeowner.objects.get(user=request.user))
-    new_view.save()
+    if request.user.role == 'homeowner':
+        new_view = CleaningListingView.objects.create(cleaning_listing=listing, homeowner=Homeowner.objects.get(user=request.user))
+        new_view.save()
     data = {
         'listing': listing,
         'belongs_to_user': request.user == listing.cleaner.user

@@ -1,4 +1,54 @@
 {
+    "service_categories": [
+        "Home Cleaning",
+        "Toilet Scrub",
+        "Window Cleaning",
+        "Pest Control"
+    ],
+    "cleaning_listings": [
+        {
+            "name": "Home Cleaning",
+            "description": "I will clean your home",
+            "price": 50
+        },
+        {
+            "name": "Toilet Scrub",
+            "description": "I will scrub your toilet",
+            "price": 25
+        },
+        {
+            "name": "Window Cleaning",
+            "description": "I will clean your windows",
+            "price": 75
+        },
+        {
+            "name": "Pest Control",
+            "description": "I will control your pests",
+            "price": 100
+        }
+    ],
+    "properties": [
+        { "name": "Home Sweet Home", "address": "123 Maple Street, Springfield, IL" },
+        { "name": "Work HQ", "address": "456 Oak Avenue, Chicago, IL" },
+        { "name": "Gym Spot", "address": "789 Fitness Lane, Naperville, IL" },
+        { "name": "Mom's House", "address": "321 Pine Road, Aurora, IL" },
+        { "name": "Beach Cabin", "address": "111 Ocean Drive, Santa Monica, CA" },
+        { "name": "Weekend Getaway", "address": "500 Lakeview Blvd, Lake Tahoe, CA" },
+        { "name": "Cousin Jenny's", "address": "200 Elm Street, Albany, NY" },
+        { "name": "Favorite Coffee", "address": "82 Roast Ave, Portland, OR" },
+        { "name": "Quiet Reading Spot", "address": "15 Library Ln, Cambridge, MA" },
+        { "name": "Best Burger Joint", "address": "99 Grill Street, Austin, TX" },
+        { "name": "In-Laws", "address": "850 Birch Street, Madison, WI" },
+        { "name": "Old Apartment", "address": "38 Cedar Lane, Newark, NJ" },
+        { "name": "Study Place", "address": "17 College Way, Durham, NC" },
+        { "name": "Dog Park", "address": "204 Bark Ave, San Diego, CA" },
+        { "name": "Date Spot", "address": "65 Candlelight Rd, New Orleans, LA" },
+        { "name": "Cozy Airbnb", "address": "133 Vacation Lane, Asheville, NC" },
+        { "name": "Dentist Office", "address": "70 Smile Blvd, Miami, FL" },
+        { "name": "Grocery Run", "address": "45 Market St, Seattle, WA" },
+        { "name": "New Office", "address": "902 Innovation Dr, Palo Alto, CA" },
+        { "name": "Friend's Place", "address": "109 Sunset Blvd, Los Angeles, CA" }
+    ],
     "superusers": [
         {
             "username": "Jux",
