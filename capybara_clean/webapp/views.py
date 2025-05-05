@@ -290,15 +290,28 @@ def cleaning_listings_browse(request):
         )
     else:
         listings = CleaningListing.objects.all()
-    data = [
-        {
-            'listing': listing,
-            'views': CleaningListingView.objects.filter(cleaning_listing=listing).count(),
-            'rating': CleaningRequest.objects.filter(cleaning_listing=listing).aggregate(Avg('rating'))['rating__avg'],
-        }
-        for listing in listings
-    ]
-    return render(request, 'webapp/cleaning_listings_browse.html', {'data': data, 'query': request.GET.get('q')})
+    listings = [{
+        'listing': listing,
+        'views': CleaningListingView.objects.filter(cleaning_listing=listing).count(),
+        'rating': CleaningRequest.objects.filter(cleaning_listing=listing).aggregate(Avg('rating'))['rating__avg'],
+    } for listing in listings]
+    
+    paginator = Paginator(listings, 8)
+    page_number = request.GET.get('page')
+    
+    try:
+        listings = paginator.page(page_number)
+    except PageNotAnInteger:
+        listings = paginator.page(1)
+    except EmptyPage:
+        listings = paginator.page(paginator.num_pages)
+
+    data = {
+        "listings": listings,
+        'query': request.GET.get('q'),
+        'page': request.GET.get('page'),
+    }
+    return render(request, 'webapp/cleaning_listings_browse.html', data)
 
 @login_required(login_url='login')
 def cleaning_listing_view(request, listing_id):
