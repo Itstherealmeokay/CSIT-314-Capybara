@@ -41,7 +41,11 @@
                         {% for request in data.requests %}
                             <tr>
                                 <td>{{ request.request_date }}</td>
-                                <td>{{ request.cleaning_listing.cleaner.full_name }}</td>
+                                <td>
+                                    <a href="{% url 'cleaner_profile' request.cleaning_listing.cleaner.id %}">
+                                        {{ request.cleaning_listing.cleaner.full_name }}
+                                    </a>
+                                </td>
                                 <td>
                                     {% if request.status == 'pending_cleaner_accept' %}
                                         <span class="badge bg-primary">Pending Cleaner Accept</span>

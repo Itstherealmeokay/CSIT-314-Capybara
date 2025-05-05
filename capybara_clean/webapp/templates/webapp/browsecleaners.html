@@ -17,14 +17,16 @@
       <tbody>
         {% for cleaner in favourite_cleaners %}
           <tr>
-          <td>{{ cleaner.full_name }}</td>
-          <td class="text-end">
-          <form method="POST" action="{% url 'browsecleaners' %}">
-          {% csrf_token %}
-          <input type="hidden" name="cleaner_id" value="{{ cleaner.id }}">
-          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-          </form>
-          </td>
+            <td>
+              <a href="{% url 'cleaner_profile' cleaner.pk %}">{{ cleaner.full_name }}</a>
+            </td>
+            <td class="text-end">
+              <form method="POST" action="{% url 'browsecleaners' %}">
+                {% csrf_token %}
+                <input type="hidden" name="cleaner_id" value="{{ cleaner.id }}">
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+              </form>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

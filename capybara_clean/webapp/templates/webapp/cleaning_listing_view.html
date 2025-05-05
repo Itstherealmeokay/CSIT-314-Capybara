@@ -9,11 +9,14 @@
             <span class="badge bg-secondary">{{ listing.status|capfirst }}</span>
         {% endif %}
     </p>
-    <p><strong>Created By:</strong> {{ listing.cleaner.full_name }}</p>
-    <p><strong>Service Category:</strong> {{ listing.service_category.name }}</p>
-    <p><strong>Date Posted:</strong> {{ listing.date_created }}</p>
+    <p>
+        <strong>Cleaner: </strong>
+        <a href="{% url 'cleaner_profile' listing.cleaner.id %}">{{ listing.cleaner.full_name }}</a>
+    </p>
+    <p><strong>Service Category: </strong>{{ listing.service_category.name }}</p>
+    <p><strong>Date Posted: </strong>{{ listing.date_created }}</p>
     {% if listing.date_closed %}
-        <p><strong>Date Closed:</strong> {{ listing.date_closed }}</p>
+        <p><strong>Date Closed: </strong>{{ listing.date_closed }}</p>
     {% endif %}
     <div class="mb-3">
         <strong>Description:</strong>
