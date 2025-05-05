@@ -317,12 +317,15 @@ def cleaning_listings_browse(request):
 @login_required(login_url='login')
 def cleaning_listing_view(request, listing_id):
     listing = get_object_or_404(CleaningListing, id=listing_id)
+    is_homeowner_favourited = False
     if request.user.role == 'homeowner':
         new_view = CleaningListingView.objects.create(cleaning_listing=listing, homeowner=Homeowner.objects.get(user=request.user))
         new_view.save()
+        is_homeowner_favourited = Homeowner.objects.get(user=request.user).favourite_listings.filter(id=listing_id).exists()
     data = {
         'listing': listing,
-        'belongs_to_user': request.user == listing.cleaner.user
+        'belongs_to_user': request.user == listing.cleaner.user,
+        'is_homeowner_favourited': is_homeowner_favourited,
     }
     return render(request, 'webapp/cleaning_listing_view.html', data)
 
@@ -355,6 +358,21 @@ def cleaning_listing_update(request, listing_id):
         form = CleaningListingForm(instance=listing)
 
     return render(request, 'webapp/cleaning_listing_update.html', {'form': form})
+
+@login_required(login_url='login')
+def cleaning_listing_favourite(request, listing_id):
+    if request.user.role != 'homeowner':
+        return redirect('cleaning_listings_view', listing_id)
+    listing = get_object_or_404(CleaningListing, id=listing_id)
+    homeowner = Homeowner.objects.get(user=request.user)
+    if request.method == 'POST':
+        if 'add_favourite' in request.POST:
+            homeowner.favourite_listings.add(listing)
+        else:
+            homeowner.favourite_listings.remove(listing)
+        if request.POST.get('redirect'):
+            return redirect(request.POST.get('redirect'))
+    return redirect('cleaning_listings_browse')
 
 @login_required(login_url='login')
 def cleaning_listing_apply(request, listing_id):

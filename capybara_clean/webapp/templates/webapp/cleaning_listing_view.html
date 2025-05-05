@@ -23,14 +23,28 @@
     </div>
     <p><strong>Price:</strong> ${{ listing.price|floatformat:2 }}</p>
 
-    <div class="mt-4">
+    <div class="d-flex gap-2 mt-4">
         {% if belongs_to_user %}
-            <a href="{% url 'cleaning_listing_update' listing.id %}" class="btn btn-warning me-2">Update</a>
-            <a href="{% url 'cleaning_listing_delete' listing.id %}" class="btn btn-danger me-2">Delete</a>
+            <a href="{% url 'cleaning_listing_update' listing.id %}" class="btn btn-warning">Update</a>
+            <a href="{% url 'cleaning_listing_delete' listing.id %}" class="btn btn-danger">Delete</a>
         {% endif %}
         {% if user.role == 'homeowner' and listing.status == 'open' %}
-            <a href="{% url 'cleaning_listing_apply' listing.id %}" class="btn btn-success me-2">Apply</a>
-            <a class="btn btn-primary me-2">Add to favourites</a>
+            <a href="{% url 'cleaning_listing_apply' listing.id %}" class="btn btn-success">Apply</a>
+            {% if is_homeowner_favourited %}
+                <form action="{% url 'cleaning_listing_favourite' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Remove from favourites</button>
+                    <input type="hidden" name="remove_favourite">
+                    <input type="hidden" name="redirect" value="/cleaner/listings/{{ listing.id }}/">
+                </form>
+            {% else %}
+                <form action="{% url 'cleaning_listing_favourite' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-info">Add to favourites</button>
+                    <input type="hidden" name="add_favourite">
+                    <input type="hidden" name="redirect" value="/cleaner/listings/{{ listing.id }}/">
+                </form>
+            {% endif %}
         {% endif %}
         <a href="{% url 'cleaning_listings_browse' %}" class="btn btn-secondary">Back to Listings</a>
     </div>

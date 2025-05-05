@@ -21,6 +21,7 @@ urlpatterns = [
     path('cleaner/listings/<int:listing_id>/update', views.cleaning_listing_update, name='cleaning_listing_update'),
     path('cleaner/listings/<int:listing_id>/delete/', views.cleaning_listing_delete, name='cleaning_listing_delete'),
     path('cleaner/listings/<int:listing_id>/apply/', views.cleaning_listing_apply, name='cleaning_listing_apply'),
+    path('cleaner/listings/<int:listing_id>/favourite/', views.cleaning_listing_favourite, name='cleaning_listing_favourite'),
 
     path('cleaner/requests/<int:request_id>/accept/', views.cleaning_request_accept, name='cleaning_request_accept'),
     path('cleaner/requests/<int:request_id>/decline/', views.cleaning_request_decline, name='cleaning_request_decline'),
