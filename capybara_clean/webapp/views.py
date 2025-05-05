@@ -286,7 +286,8 @@ def cleaning_listings_browse(request):
         query = request.GET.get('q').strip()
         listings = CleaningListing.objects.filter(
             Q(name__icontains=query) |
-            Q(description__icontains=query)
+            Q(description__icontains=query) |
+            Q(service_category__name__icontains=query)
         )
     else:
         listings = CleaningListing.objects.all()
