@@ -1,8 +1,15 @@
 {%extends 'webapp/base.html'%}
 
 {%block content%}
-<h3> Welcome to HomeOwner Dashboard, User {{user}}</h3>
-<a class ="btn btn-primary" href="{% url 'browsecleaners' %}">Browse Cleaners</a>
+<h3> Welcome to your Homeowner Dashboard, {{user}}</h3>
+
+{% if num_notifications %}
+    <div class="card border-info shadow-sm mb-5">
+        <div class="card-body">
+            <h5 class="card-title text-info">You have {{ num_notifications }} items pending action</h5>
+        </div>
+    </div>
+{% endif %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4>My Properties</h4>
