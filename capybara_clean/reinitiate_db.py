@@ -75,7 +75,7 @@ def add_cleaning_requests():
         CleaningRequest.objects.create(
             cleaning_listing=listing, 
             property=random.choice(properties),
-            status=random.choice(CleaningRequestStatus.choices),
+            status=random.choice(CleaningRequestStatus.choices)[0],
             request_date=dt.datetime.now() + dt.timedelta(days=random.randint(0, 30), hours=random.randint(0, 23), minutes=random.randint(0, 59)),
         )
 
