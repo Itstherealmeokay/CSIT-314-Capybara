@@ -1,0 +1,47 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Your Booking History</h1>
+
+    {% if all_requests %}
+    <div class="flex-fill">
+        <h5 class="mt-4">Your Bookings</h5>
+        <table class="table table-striped table-bordered mb-4">
+            <thead class="bg-primary text-black">
+                <tr>
+                    <th>Cleaner</th>
+                    <th>Listing</th>
+                    <th>Date Requested</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in all_requests %}
+                <tr>
+                    <td>{{ request.cleaning_listing.cleaner.full_name }}</td>
+                    <td>{{ request.cleaning_listing.name }}</td>
+                    <td>{{ request.request_date|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if request.status == 'pending_cleaner_accept' %}
+                            <span class="badge bg-primary">Pending Cleaner Accept</span>
+                        {% elif request.status == 'pending_cleaning' %}
+                            <span class="badge bg-primary">Pending Cleaning</span>
+                        {% elif request.status == 'declined' %}
+                            <span class="badge bg-danger">Declined</span>
+                        {% elif request.status == 'pending_review' %}
+                            <span class="badge bg-secondary">Pending Review</span>
+                        {% elif request.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">You have not made any bookings yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -479,6 +479,16 @@ def cleaning_request_review(request, request_id):
         'cleaning_request': cleaning_request,
     })
 
+
+class RequestHistory(LoginRequiredMixin, View):
+    def get(self, request):
+        all_requests = CleaningRequest.objects.filter(property__homeowner__user=request.user).order_by('-request_date')
+
+        return render(request, 'webapp/request_history.html', {
+            'user': request.user,
+            'all_requests': all_requests
+        })
+
 def refresh_cleaner_rating(cleaner):
     all_requests = CleaningRequest.objects.filter(
         Q(cleaning_listing__cleaner=cleaner) & Q(status=CleaningRequestStatus.COMPLETED)

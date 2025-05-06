@@ -80,7 +80,7 @@ class CleaningRequestStatus(models.TextChoices):
 
 class CleaningRequest(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE, null=True)
-    property = models.ForeignKey(Property, on_delete=models.SET_NULL, null=True)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, null=True)
     request_date = models.DateTimeField()
     status = models.CharField(max_length=40, choices=CleaningRequestStatus.choices, default=CleaningRequestStatus.PENDING_CLEANER_ACCEPT)
     rating = models.IntegerField(null=True, blank=True)
