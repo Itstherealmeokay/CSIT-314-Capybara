@@ -2,12 +2,21 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
   <div class="d-flex align-items-center">
     {% if user.is_authenticated %}
-      <a class="navbar-brand main-heading" href="{% url 'dashboard' %}"> 
-        &nbsp; Capybara Clean
+      <a class="navbar-brand main-heading" href="{% url 'dashboard' %}">
+        &nbsp;<img src="{% static 'css/capy2.png' %}" alt="Capybara Clean Logo"
+        height="40" width="40"
+        class="me-2 rounded-circle border border-light"
+        style="object-fit: cover;"> 
+        Capybara Clean
       </a>
+
     {% else %}
-      <a class="navbar-brand main-heading" href="{% url '' %}"> 
-        &nbsp; Capybara Clean
+      <a class="navbar-brand main-heading" href="{% url '' %}">
+        &nbsp;<img src="{% static 'css/capy2.png' %}" alt="Capybara Clean Logo"
+        height="40" width="40"
+        class="me-2 rounded-circle border border-light"
+        style="object-fit: cover;">
+        Capybara Clean 
       </a>
     {% endif %}
     <button
