@@ -53,7 +53,7 @@ class CleaningListingStatus(models.TextChoices):
     CLOSED = 'closed'
 
 class CleaningListing(models.Model):
-    cleaner = models.ForeignKey(Cleaner, on_delete=models.SET_NULL, null=True)
+    cleaner = models.ForeignKey(Cleaner, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True)
@@ -79,7 +79,7 @@ class CleaningRequestStatus(models.TextChoices):
     COMPLETED = 'completed'
 
 class CleaningRequest(models.Model):
-    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.SET_NULL, null=True)
+    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE, null=True)
     property = models.ForeignKey(Property, on_delete=models.SET_NULL, null=True)
     request_date = models.DateTimeField()
     status = models.CharField(max_length=40, choices=CleaningRequestStatus.choices, default=CleaningRequestStatus.PENDING_CLEANER_ACCEPT)
