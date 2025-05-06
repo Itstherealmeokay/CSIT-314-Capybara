@@ -80,6 +80,6 @@ def add_cleaning_requests():
         )
 
 if __name__ == "__main__":
-    # register_users()
-    # add_cleaning_listing()
+    register_users()
+    add_cleaning_listing()
     add_cleaning_requests()
