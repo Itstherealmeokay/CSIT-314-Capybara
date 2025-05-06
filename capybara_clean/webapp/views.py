@@ -66,9 +66,14 @@ class LoginView(View):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            if hasattr(user, 'is_suspended') and user.is_suspended:
+                messages.error(request, 'Your account has been suspended.')
+                return render(request, 'webapp/login.html', {'form': form})
             auth.login(request, user)
             return redirect('dashboard')
-        return render(request, 'webapp/login.html', {'form': form})
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'webapp/login.html', {'form': form})
 
 class Dashboard(LoginRequiredMixin, View):
     login_url = 'login'

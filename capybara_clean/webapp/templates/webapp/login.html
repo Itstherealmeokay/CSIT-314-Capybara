@@ -1,33 +1,49 @@
 {% extends 'webapp/base.html' %}
-
 {% load crispy_forms_tags %}
 
 {% block content %}
-
 <body>
-    <div class="container bg-light shadow-md, p-5 form-layout">
+    <div class="container bg-light shadow-md p-5 form-layout">
 
         <h3>Login to your Account</h3>
         <hr>
         <br>
 
+        <!-- Display Django messages -->
+        {% if messages %}
+            <div id="messages">
+                {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <form method="POST" autocomplete="off">
             {% csrf_token %}
-            {{form|crispy}}
+            {{ form|crispy }}
             <br>
-
-            <button type="submit" class="btn btn-primary w-100, btn-block p-2">Login</button>
-
+            <button type="submit" class="btn btn-primary w-100 btn-block p-2">Login</button>
         </form>
 
         <br>
-
         <div class="text-center">
             <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
         </div>
     </div>
     <br>
+
+    <!-- Auto-hide messages after 3 seconds -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                const messages = document.getElementById('messages');
+                if (messages) {
+                    messages.style.display = 'none';
+                }
+            }, 3000); // 3 seconds
+        });
+    </script>
 </body>
-
-
 {% endblock %}

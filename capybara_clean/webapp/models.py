@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
         ('platform_manager', 'Platform Manager'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
+    is_suspended = models.BooleanField(default=False)
 
 #Profile
 
