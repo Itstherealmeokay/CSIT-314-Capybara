@@ -4,8 +4,8 @@
     {% if user.is_authenticated %}
       <a class="navbar-brand main-heading" href="{% url 'dashboard' %}">
         &nbsp;<img src="{% static 'css/capy2.png' %}" alt="Capybara Clean Logo"
-        height="40" width="40"
-        class="me-2 rounded-circle border border-light"
+        height="45" width="45"
+        class="me-2 rounded-circle shadow"
         style="object-fit: cover;"> 
         Capybara Clean
       </a>
@@ -13,8 +13,8 @@
     {% else %}
       <a class="navbar-brand main-heading" href="{% url '' %}">
         &nbsp;<img src="{% static 'css/capy2.png' %}" alt="Capybara Clean Logo"
-        height="40" width="40"
-        class="me-2 rounded-circle border border-light"
+        height="45" width="45"
+        class="me-2 rounded-circle shadow"
         style="object-fit: cover;">
         Capybara Clean 
       </a>
