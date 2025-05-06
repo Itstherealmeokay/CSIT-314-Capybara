@@ -267,6 +267,7 @@ def property_delete(request, property_id):
 @login_required(login_url='login')
 def browse_cleaners(request):
     query = request.GET.get('q')
+    fav_query = request.GET.get('fq')
     homeowner = Homeowner.objects.get(user=request.user)
     cleaners = Cleaner.objects.all()
     favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners.all()
@@ -284,7 +285,15 @@ def browse_cleaners(request):
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
             Q(full_name__icontains=query) 
-    )
+        )
+        
+    if fav_query:
+        fav_query = fav_query.strip()
+        favourite_cleaners = favourite_cleaners.filter(
+            Q(user__first_name__icontains=fav_query) |
+            Q(user__last_name__icontains=fav_query) |
+            Q(full_name__icontains=fav_query) 
+        )
         
     paginator = Paginator(cleaners, 8)
     page_number = request.GET.get('page')
@@ -295,8 +304,9 @@ def browse_cleaners(request):
         cleaners = paginator.page(1)
     except EmptyPage:
         cleaners = paginator.page(paginator.num_pages)
+    
 
-    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners})
+    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners, 'favourite_query': fav_query})
 
 @login_required(login_url='login')
 def cleaning_listings_browse(request):
