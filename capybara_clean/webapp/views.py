@@ -165,12 +165,12 @@ class Dashboard(LoginRequiredMixin, View):
                     'top_3_requested': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
                 },
                 'monthly': {
-                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today).count(),
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(day=1)).count(),
                     'top_3_viewed': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
                     'top_3_requested': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
                 },
                 'yearly': {
-                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today).count(),
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(month=1, day=1)).count(),
                     'top_3_viewed': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
                     'top_3_requested': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
                 },
