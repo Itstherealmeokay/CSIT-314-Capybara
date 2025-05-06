@@ -1,0 +1,26 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Listings by {{ cleaner.full_name }}</h1>
+
+    {% if listings %}
+        <div class="row">
+            {% for listing in listings %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ listing.name }}</h5>
+                            <p class="card-text">{{ listing.description }}</p>
+                            <p class="card-text"><strong>Price:</strong> ${{ listing.price }}</p>
+                            <a href="{% url 'cleaning_listing_view' listing.id %}" class="btn btn-primary">View Listing</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">This cleaner has not posted any listings yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

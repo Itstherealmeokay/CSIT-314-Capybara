@@ -318,6 +318,8 @@ def cleaning_listings_browse(request):
         'rating': CleaningRequest.objects.filter(cleaning_listing=listing).aggregate(Avg('rating'))['rating__avg'],
     } for listing in listings]
     
+    
+    
     paginator = Paginator(listings, 8)
     page_number = request.GET.get('page')
     
@@ -366,6 +368,14 @@ def cleaning_listing_create(request):
         form = CleaningListingForm()
 
     return render(request, 'webapp/cleaning_listing_create.html', {'form': form})
+
+class HomeViewListings(LoginRequiredMixin, View):
+    login_url = 'login'
+    
+    def get(self, request, pk):
+        cleaner = get_object_or_404(Cleaner, pk=pk)
+        listings = CleaningListing.objects.filter(cleaner=cleaner)
+        return render(request, 'webapp/homeviewlisting.html', {'cleaner': cleaner, 'listings': listings})
 
 @login_required(login_url='login')
 def cleaning_listing_update(request, listing_id):

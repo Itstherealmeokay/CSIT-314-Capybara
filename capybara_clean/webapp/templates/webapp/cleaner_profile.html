@@ -5,9 +5,11 @@
 <div class="container bg-light shadow-md, p-5">
   <h2>{{ cleaner.full_name }}'s Profile</h2>
   <hr>
-  <p><strong>Email:</strong> {{ cleaner.email }}</p>
+  <p><strong>Email:</strong> {{ cleaner.user.email }}</p>
   <p><strong>Phone Number:</strong> {{ cleaner.phone_number }}</p>
   <p><strong>Address:</strong> {{ cleaner.address }}</p>
+
+  <a href="{% url 'cleaner_listings_view' cleaner.pk %}" class= "btn btn-primary mt-3">View Listings</a>
 
   {% if is_favourited %}
     <form method="POST" action="{% url 'cleaner_profile' cleaner.id %}">
