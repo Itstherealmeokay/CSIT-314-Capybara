@@ -93,16 +93,32 @@ class Dashboard(LoginRequiredMixin, View):
         return redirect('/admin/')
 
     def homeowner_dashboard(self, request):
-        properties = Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user))
-        property_data = [{
-            'property': property,
-            'requests': CleaningRequest.objects.filter(property=property),
-        } for property in properties]
+        # Get homeowner's properties
+        properties = Property.objects.filter(homeowner__user=request.user)
+        property_data = []
+
+        for property in properties:
+            # Get all requests for the property
+            all_requests = CleaningRequest.objects.filter(property=property).order_by('-request_date')
+
+            # Unique query param for this property (e.g., ?page_5=2 for property id 5)
+            page_number = request.GET.get(f'page_{property.id}', 1)
+
+            # Paginate requests (3 per page)
+            paginator = Paginator(all_requests, 3)
+            page_obj = paginator.get_page(page_number)
+
+            property_data.append({
+                'property': property,
+                'requests': page_obj,  # This is a paginated object now
+            })
+
+        # Count notifications
         num_notifications = CleaningRequest.objects.filter(
-            property__homeowner__user=request.user
-        ).filter(
-            Q(status=CleaningRequestStatus.PENDING_REVIEW)
+            property__homeowner__user=request.user,
+            status=CleaningRequestStatus.PENDING_REVIEW
         ).count()
+
         return render(request, 'webapp/dashboard_homeowner.html', {
             'user': request.user,
             'property_data': property_data,
