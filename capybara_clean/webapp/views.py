@@ -482,11 +482,21 @@ def cleaning_request_review(request, request_id):
 
 class RequestHistory(LoginRequiredMixin, View):
     def get(self, request):
+        search_query = request.GET.get('search', '')
         all_requests = CleaningRequest.objects.filter(property__homeowner__user=request.user).order_by('-request_date')
+        
+        if search_query:
+            all_requests = all_requests.filter(
+                Q(cleaning_listing__cleaner__full_name__icontains=search_query) |
+                Q(cleaning_listing__name__icontains=search_query) |
+                Q(request_date__icontains=search_query) |
+                Q(status__icontains=search_query)
+            )
 
         return render(request, 'webapp/request_history.html', {
             'user': request.user,
-            'all_requests': all_requests
+            'all_requests': all_requests,
+            'search_query': search_query,
         })
 
 def refresh_cleaner_rating(cleaner):
