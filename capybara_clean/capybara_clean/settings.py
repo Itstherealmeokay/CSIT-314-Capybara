@@ -45,7 +45,14 @@ INSTALLED_APPS = [
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 JAZZMIN_SETTINGS = {
-    'show_ui_builder': True
+    'show_ui_builder': True,
+    "site_brand": "Capybara Clean",
+    "changeform_format": "horizontal_tabs",
+    "site_logo": "css/capy2.png",
+    "login_logo": "css/capyclean.png",
+    "welcome_sign": "Welcome to Capy Clean",
+    
+    
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -77,7 +84,9 @@ JAZZMIN_UI_TWEAKS = {
         "warning": "btn-warning",
         "danger": "btn-danger",
         "success": "btn-success"
-    }
+    },
+    
+
 }
 
 MIDDLEWARE = [

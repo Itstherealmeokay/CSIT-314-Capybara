@@ -28,6 +28,7 @@ class CustomUserAdmin(UserAdmin):
     # Optional: Show role in the list view
     list_display = ["username", "email", "first_name", "last_name", "role", "is_staff", "is_suspended"]
     list_filter = ["role", "is_staff", "is_suspended"]
+    search_fields = ["username", "email", "first_name", "last_name"]
 
 # Register with the custom admin
 admin.site.register(CustomUser, CustomUserAdmin)
