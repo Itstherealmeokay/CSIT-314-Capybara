@@ -375,15 +375,13 @@ def cleaning_request_review(request, request_id):
     })
 
 
-class RequestHistory(LoginRequiredMixin, View):
+class SearchRequestHistory(LoginRequiredMixin, View):
     def get(self, request):
-        search_query = request.GET.get('search', '')
-        all_requests = CleaningRequest.get_filtered_requests(request.user, search_query)
+        all_requests, search_query = CleaningRequest.get_filtered_requests(request)
 
         return render(request, 'webapp/request_history.html', {
-            'user': request.user,
             'all_requests': all_requests,
-            'search_query': search_query,
+            'search_query': search_query   
         })
 
 

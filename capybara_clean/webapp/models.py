@@ -228,7 +228,9 @@ class CleaningRequest(models.Model):
         return f'{self.cleaning_listing.name} on {self.property.address} - {self.status}'
 
     @classmethod
-    def get_filtered_requests(cls, user, search_query=''):
+    def get_filtered_requests(cls, request):
+        user = request.user
+        search_query = request.GET.get('search')
         queryset = cls.objects.filter(property__homeowner__user=user)
         if search_query:
             queryset = queryset.filter(
@@ -237,6 +239,6 @@ class CleaningRequest(models.Model):
                 Q(request_date__icontains=search_query) |
                 Q(status__icontains=search_query)
             )
-        return queryset.order_by('-request_date')
+        return queryset.order_by('-request_date'), search_query
 
 

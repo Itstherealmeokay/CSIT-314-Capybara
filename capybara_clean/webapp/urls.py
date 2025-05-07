@@ -23,7 +23,7 @@ urlpatterns = [
     path('cleaner/listings/<int:listing_id>/apply/', views.cleaning_listing_apply, name='cleaning_listing_apply'),
     path('cleaner/listings/<int:listing_id>/favourite/', views.cleaning_listing_favourite, name='cleaning_listing_favourite'),
     path('cleaner/<int:pk>/listings/', views.HomeViewListings.as_view(), name='cleaner_listings_view'),
-    path('request_history/', views.RequestHistory.as_view(), name='request_history'),
+    path('request_history/', views.SearchRequestHistory.as_view(), name='request_history'),
 
     path('cleaner/requests/<int:request_id>/accept/', views.cleaning_request_accept, name='cleaning_request_accept'),
     path('cleaner/requests/<int:request_id>/decline/', views.cleaning_request_decline, name='cleaning_request_decline'),
