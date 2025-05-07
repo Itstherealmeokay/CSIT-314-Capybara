@@ -3,7 +3,7 @@
 {%block content%}
 <h3> Welcome to your Homeowner Dashboard, {{user}}</h3>
 
-{% if num_notifications %}
+{% if dash.num_notifications %}
     <div class="card border-info shadow-sm mb-5">
         <div class="card-body">
             <h5 class="card-title text-info">You have {{ num_notifications }} items pending action</h5>
@@ -16,7 +16,7 @@
     <a href="{% url 'property_create' %}" class="btn btn-success">+ Register New Property</a>
 </div>
 
-{% for data in property_data %}
+{% for data in dash.property_data %}
 <div class="card mb-4 shadow-sm">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">

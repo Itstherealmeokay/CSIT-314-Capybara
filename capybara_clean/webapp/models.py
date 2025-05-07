@@ -56,7 +56,17 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
-    
+
+class ViewDashboard(models.Model):
+    def get_dash(self, request):
+        user = request.user
+        if user.role == 'homeowner':
+            dash = Homeowner.objects.get(user=user).get_dashboard_data(request)
+            return {'user': user, 'dash': dash}
+        elif user.role == 'cleaner':
+            return Cleaner.objects.get(user=user).get_dashboard_data()        
+        elif user.role == 'platform_manager':
+            return PlatformManager.objects.get(user=user).get_dashboard_data()  
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

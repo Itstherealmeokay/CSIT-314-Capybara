@@ -77,36 +77,8 @@ class Dashboard(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
-        user = request.user
-
-        if user.is_staff:
-            return redirect('/admin/')
-
-        if user.role == 'homeowner':
-            return self.render_homeowner_dashboard(user, request)
-
-        if user.role == 'cleaner':
-            return self.render_cleaner_dashboard(user, request)
-
-        if user.role == 'platform_manager':
-            return self.render_platform_manager_dashboard(user, request)
-
-        return redirect('login')
-
-    def render_homeowner_dashboard(self, user, request):
-        homeowner = Homeowner.objects.get(user=user)
-        data = homeowner.get_dashboard_data(request)
-        return render(request, 'webapp/dashboard_homeowner.html', {'user': user, **data})
-
-    def render_cleaner_dashboard(self, user, request):
-        cleaner = Cleaner.objects.get(user=user)
-        data = cleaner.get_dashboard_data()
-        return render(request, 'webapp/dashboard_cleaner.html', {'user': user, **data})
-    
-    def render_platform_manager_dashboard(self, user, request):
-        platform_manager = PlatformManager.objects.get(user=user)
-        data = platform_manager.get_dashboard_data()
-        return render(request, 'webapp/dashboard_platformmanager.html', {'user': user, **data})
+        dashdata = ViewDashboard().get_dash(request)
+        return render(request, 'webapp/dashboard.html', dashdata)
 
 class ViewProfileView(LoginRequiredMixin, View):
     def get(self, request):

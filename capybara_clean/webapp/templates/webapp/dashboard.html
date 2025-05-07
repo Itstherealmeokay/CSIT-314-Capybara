@@ -1,11 +1,13 @@
-{%extends 'webapp/base.html'%}
-
-{%block content%}
-<h3> Welcome to Dashboard, User {{user}}</h3>
-<a class ="btn btn-primary" href="{% url 'dashboard' %}">Create a New Record</a>
 
 
 
+  {% if user.role == 'homeowner' %}
+    {% include 'webapp/dashboard_homeowner.html' %}
+  {% elif user.role == 'cleaner' %}
+    {% include 'webapp/dashboard_cleaner.html' %}
+  {% elif user.role == 'platform_manager' %}
+    {% include 'webapp/dashboard_platformmanager.html' %}
+  {% else %}
+    <p>No dashboard available for your role.</p>
+  {% endif %}
 
-
-{%endblock%}
