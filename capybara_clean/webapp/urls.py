@@ -3,15 +3,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name=''),
+    path('', views.HomeView.as_view(), name=''),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'), 
 
     path('dashboard/', views.Dashboard.as_view(), name='dashboard'),
 
-    path('edit_profile/', views.edit_profile, name='edit_profile'),
-    path('view_profile/', views.view_profile, name='view_profile'),
+    path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
+    path('view_profile/', views.ViewProfileView.as_view(), name='view_profile'),
 
     path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
     path('cleaner/<int:pk>/', views.CleanerProfile.as_view(), name='cleaner_profile'),
@@ -30,9 +30,9 @@ urlpatterns = [
     path('cleaner/requests/<int:request_id>/completed/', views.cleaning_request_completed, name='cleaning_request_completed'),
     path('cleaner/requests/<int:request_id>/review/', views.cleaning_request_review, name='cleaning_request_review'),
 
-    path('property/create/', views.property_create, name='property_create'),
-    path('property/<int:property_id>/update', views.property_update, name='property_update'),
-    path('property/<int:property_id>/delete', views.property_delete, name='property_delete'),
+    path('property/create/', views.PropertyCreateView.as_view(), name='property_create'),
+    path('property/<int:property_id>/update', views.PropertyUpdateView.as_view(), name='property_update'),
+    path('property/<int:property_id>/delete', views.PropertyDeleteView.as_view(), name='property_delete'),
 
     path('service_category/create/', views.service_category_create, name='service_category_create'),
     path('service_category/', views.service_category_view, name='service_category_view'),

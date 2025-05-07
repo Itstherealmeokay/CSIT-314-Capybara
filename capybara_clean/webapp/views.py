@@ -14,11 +14,11 @@ from datetime import datetime
 from .forms import *
 from .models import *
 
-
-def home(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    return render(request, 'webapp/index.html')
+class HomeView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return render(request, 'webapp/index.html')
 
 class RegisterView(View):
     def get(self, request):
@@ -39,20 +39,20 @@ class RegisterView(View):
         elif role == 'platform_manager':
             PlatformManager.objects.create(user=user)
         return redirect('login')
+class EditProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        form = UserProfileForm(instance=profile)
+        return render(request, 'webapp/edit_profile.html', {'form': form})
 
-def edit_profile(request):
-    user = request.user
-    profile, created = UserProfile.objects.get_or_create(user=user)
-    if request.method == 'POST':
+    def post(self, request):
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
             return redirect('view_profile')
-    else:
-        form = UserProfileForm(instance=profile)
+        return render(request, 'webapp/edit_profile.html', {'form': form})
 
-    context = {'form': form}
-    return render(request, 'webapp/edit_profile.html', context)
 
 class LoginView(View):
     def get(self, request):
@@ -195,17 +195,16 @@ class Dashboard(LoginRequiredMixin, View):
         
         return render(request, 'webapp/dashboard_platformmanager.html', data)
 
-@login_required(login_url='login')
-def view_profile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    properties = None
-    if Homeowner.objects.filter(user=request.user).exists():
-        properties = Property.objects.filter(homeowner=Homeowner.objects.get(user=request.user))
-    data = {
-        'profile': profile,
-        'properties': properties,
-    }
-    return render(request, 'webapp/view_profile.html', data)
+class ViewProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        properties = None
+        if Homeowner.objects.filter(user=request.user).exists():
+            properties = Property.objects.filter(homeowner__user=request.user)
+        return render(request, 'webapp/view_profile.html', {
+            'profile': profile,
+            'properties': properties,
+        })
 
 class CleanerProfile(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -223,46 +222,57 @@ class CleanerProfile(LoginRequiredMixin, View):
         is_favourited = favourite_cleaners.contains(cleaner)
         return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
 
-@login_required(login_url='login')
-def property_create(request):
-    if request.user.role != 'homeowner':
-        return redirect('view_profile')
+class PropertyCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.role != 'homeowner':
+            return redirect('view_profile')
+        form = PropertyForm()
+        return render(request, 'webapp/property_create.html', {'form': form})
 
-    if request.method == 'POST':
+    def post(self, request):
+        if request.user.role != 'homeowner':
+            return redirect('view_profile')
         form = PropertyForm(request.POST)
         if form.is_valid():
             property = form.save(commit=False)
             property.homeowner = Homeowner.objects.get(user=request.user)
             property.save()
             return redirect('view_profile')
-    else:
-        form = PropertyForm()
+        return render(request, 'webapp/property_create.html', {'form': form})
 
-    return render(request, 'webapp/property_create.html', {'form': form})
 
-@login_required(login_url='login')
-def property_update(request, property_id):
-    property = Property.objects.get(id=property_id)
-    if property.homeowner.user != request.user:
-        return redirect('view_profile')
-    
-    if request.method == 'POST':
+class PropertyUpdateView(LoginRequiredMixin, View):
+    def get(self, request, property_id):
+        property = get_object_or_404(Property, id=property_id)
+        if property.homeowner.user != request.user:
+            return redirect('view_profile')
+        form = PropertyForm(instance=property)
+        return render(request, 'webapp/property_update.html', {'form': form})
+
+    def post(self, request, property_id):
+        property = get_object_or_404(Property, id=property_id)
+        if property.homeowner.user != request.user:
+            return redirect('view_profile')
         form = PropertyForm(request.POST, instance=property)
         if form.is_valid():
             form.save()
             return redirect('view_profile')
-    else:
-        form = PropertyForm(instance=property)
+        return render(request, 'webapp/property_update.html', {'form': form})
 
-    return render(request, 'webapp/property_update.html', {'form': form})
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
+from .models import Property
 
-@login_required(login_url='login')
-def property_delete(request, property_id):
-    property = Property.objects.get(id=property_id)
-    if property.homeowner.user != request.user:
+class PropertyDeleteView(LoginRequiredMixin, View):
+    login_url = 'login'
+    def post(self, request, property_id):
+        property = get_object_or_404(Property, id=property_id)
+        if property.homeowner.user != request.user:
+            return redirect('view_profile')
+        property.delete()
         return redirect('view_profile')
-    property.delete()
-    return redirect('view_profile')
+
 
 @login_required(login_url='login')
 def browse_cleaners(request):
