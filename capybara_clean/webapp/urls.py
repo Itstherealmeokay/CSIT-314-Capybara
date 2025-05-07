@@ -11,7 +11,7 @@ urlpatterns = [
     path('dashboard/', views.Dashboard.as_view(), name='dashboard'),
 
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
-    path('view_profile/', views.ViewProfileView.as_view(), name='view_profile'),
+    path('view_profile/', views.ViewUserProfile.as_view(), name='view_profile'),
 
     path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
     path('cleaner/<int:pk>/', views.CleanerProfile.as_view(), name='cleaner_profile'),

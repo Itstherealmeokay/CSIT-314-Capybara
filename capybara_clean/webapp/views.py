@@ -80,16 +80,10 @@ class Dashboard(LoginRequiredMixin, View):
         dashdata = ViewDashboard().get_dash(request)
         return render(request, 'webapp/dashboard.html', dashdata)
 
-class ViewProfileView(LoginRequiredMixin, View):
+class ViewUserProfile(LoginRequiredMixin, View):
     def get(self, request):
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        properties = None
-        if Homeowner.objects.filter(user=request.user).exists():
-            properties = Property.objects.filter(homeowner__user=request.user)
-        return render(request, 'webapp/view_profile.html', {
-            'profile': profile,
-            'properties': properties,
-        })
+        data = UserProfile().get_profile_info(request)
+        return render(request, 'webapp/view_profile.html', data)
 
 class CleanerProfile(LoginRequiredMixin, View):
     def get(self, request, pk):

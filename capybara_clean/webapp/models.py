@@ -56,6 +56,16 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
+    
+    def get_profile_info(self, request):
+        profile,_= UserProfile.objects.get_or_create(user = request.user)
+        properties = None
+        if Homeowner.objects.filter(user=request.user).exists():
+            properties = Property.objects.filter(homeowner__user=request.user)
+        return {
+            'profile': profile,
+            'properties': properties,
+        }
 
 class ViewDashboard(models.Model):
     def get_dash(self, request):
