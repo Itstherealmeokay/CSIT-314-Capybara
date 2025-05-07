@@ -6,6 +6,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.contrib.auth import authenticate
 from django.urls import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class CustomUser(AbstractUser):
@@ -56,15 +57,103 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
+    
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)
     favourite_listings = models.ManyToManyField('CleaningListing', related_name='favourite_listings', blank=True)
 
-class Cleaner(UserProfile):
-    pass
+    def get_dashboard_data(self, request):
+        properties = Property.objects.filter(homeowner=self)
+        property_data = []
 
-class PlatformManager(UserProfile):
-    pass
+        for property in properties:
+            all_requests = property.cleaning_requests.all().order_by('-request_date')
+            page_number = request.GET.get(f'page_{property.id}', 1)
+            paginator = Paginator(all_requests, 3)
+            page_obj = paginator.get_page(page_number)
+            property_data.append({
+                'property': property,
+                'requests': page_obj
+            })
+
+        num_notifications = CleaningRequest.objects.filter(
+            property__homeowner=self,
+            status=CleaningRequestStatus.PENDING_REVIEW
+        ).count()
+
+        return {
+            'property_data': property_data,
+            'num_notifications': num_notifications
+        }
+class Cleaner(UserProfile):
+     def get_dashboard_data(self):
+        listings = self.cleaning_listings.all()
+        listing_data = [{
+            'listing': listing,
+            'requests': listing.requests.all()
+        } for listing in listings]
+
+        num_notifications = CleaningRequest.objects.filter(
+            cleaning_listing__cleaner=self
+        ).filter(
+            Q(status=CleaningRequestStatus.PENDING_CLEANER_ACCEPT) |
+            Q(status=CleaningRequestStatus.PENDING_CLEANING)
+        ).count()
+
+        return {
+            'listing_data': listing_data,
+            'num_notifications': num_notifications
+        }
+
+class PlatformManager(UserProfile):  # or whatever base class you use
+    def get_dashboard_data(self):
+        def get_cleaner_stats(start_date: datetime):
+            return [{
+                'cleaner': cleaner,
+                'num_requests': CleaningRequest.objects.filter(
+                    Q(request_date__date__gte=start_date) & Q(cleaning_listing__cleaner=cleaner)
+                ).count(),
+                'views': CleaningListingView.objects.filter(
+                    Q(date_viewed__date__gte=start_date) & Q(cleaning_listing__cleaner=cleaner)
+                ).count(),
+            } for cleaner in Cleaner.objects.all()]
+
+        start_of_today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        daily_cleaner_stats = get_cleaner_stats(start_of_today)
+        monthly_cleaner_stats = get_cleaner_stats(start_of_today.replace(day=1))
+        yearly_cleaner_stats = get_cleaner_stats(start_of_today.replace(month=1, day=1))
+
+        return {
+            'new_users': CustomUser.objects.order_by('-date_joined')[:3],
+            'overall_stats': {
+                'cleaner': {
+                    'users': Cleaner.objects.count(),
+                    'listings': CleaningListing.objects.count(),
+                    'requests': CleaningRequest.objects.count(),
+                },
+                'homeowner': {
+                    'users': Homeowner.objects.count(),
+                    'properties': Property.objects.count(),
+                },
+            },
+            'reports': {
+                'daily': {
+                    'registrations': CustomUser.objects.filter(date_joined__date=start_of_today).count(),
+                    'top_3_viewed': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
+                    'top_3_requested': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
+                },
+                'monthly': {
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(day=1)).count(),
+                    'top_3_viewed': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
+                    'top_3_requested': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
+                },
+                'yearly': {
+                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(month=1, day=1)).count(),
+                    'top_3_viewed': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
+                    'top_3_requested': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
+                },
+            },
+        }
 
 class Property(models.Model):
     homeowner = models.ForeignKey(Homeowner, on_delete=models.SET_NULL, null=True)
@@ -85,7 +174,7 @@ class CleaningListingStatus(models.TextChoices):
     CLOSED = 'closed'
 
 class CleaningListing(models.Model):
-    cleaner = models.ForeignKey(Cleaner, on_delete=models.CASCADE, null=True)
+    cleaner = models.ForeignKey(Cleaner, on_delete=models.CASCADE, null=True, related_name='cleaning_listings')
     name = models.CharField(max_length=100)
     description = models.TextField()
     service_category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True)
@@ -118,8 +207,8 @@ from django.db import models
 from django.db.models import Q
 
 class CleaningRequest(models.Model):
-    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE, null=True)
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, null=True)
+    cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE, null=True, related_name='requests')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, null=True, related_name='cleaning_requests')
     request_date = models.DateTimeField()
     status = models.CharField(max_length=40, choices=CleaningRequestStatus.choices, default=CleaningRequestStatus.PENDING_CLEANER_ACCEPT)
     rating = models.IntegerField(null=True, blank=True)

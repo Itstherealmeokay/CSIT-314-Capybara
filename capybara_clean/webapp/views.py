@@ -39,6 +39,7 @@ class RegisterView(View):
         elif role == 'platform_manager':
             PlatformManager.objects.create(user=user)
         return redirect('login')
+    
 class EditProfileView(LoginRequiredMixin, View):
     def get(self, request):
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -76,121 +77,36 @@ class Dashboard(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
-        if request.user.is_staff:
-            return self.admin_dashboard(request)
-        if request.user.role == 'homeowner':
-            return self.homeowner_dashboard(request)
-        if request.user.role == 'cleaner':
-            return self.cleaner_dashboard(request)
-        if request.user.role == 'platform_manager':
-            return self.platform_manager_dashboard(request)
+        user = request.user
+
+        if user.is_staff:
+            return redirect('/admin/')
+
+        if user.role == 'homeowner':
+            return self.render_homeowner_dashboard(user, request)
+
+        if user.role == 'cleaner':
+            return self.render_cleaner_dashboard(user, request)
+
+        if user.role == 'platform_manager':
+            return self.render_platform_manager_dashboard(user, request)
+
         return redirect('login')
+
+    def render_homeowner_dashboard(self, user, request):
+        homeowner = Homeowner.objects.get(user=user)
+        data = homeowner.get_dashboard_data(request)
+        return render(request, 'webapp/dashboard_homeowner.html', {'user': user, **data})
+
+    def render_cleaner_dashboard(self, user, request):
+        cleaner = Cleaner.objects.get(user=user)
+        data = cleaner.get_dashboard_data()
+        return render(request, 'webapp/dashboard_cleaner.html', {'user': user, **data})
     
-    def admin_dashboard(self, request):
-        return redirect('/admin/')
-
-    def homeowner_dashboard(self, request):
-        # Get homeowner's properties
-        properties = Property.objects.filter(homeowner__user=request.user)
-        property_data = []
-
-        for property in properties:
-            # Get all requests for the property
-            all_requests = CleaningRequest.objects.filter(property=property).order_by('-request_date')
-
-            # Unique query param for this property (e.g., ?page_5=2 for property id 5)
-            page_number = request.GET.get(f'page_{property.id}', 1)
-
-            # Paginate requests (3 per page)
-            paginator = Paginator(all_requests, 3)
-            page_obj = paginator.get_page(page_number)
-
-            property_data.append({
-                'property': property,
-                'requests': page_obj,  # This is a paginated object now
-            })
-
-        # Count notifications
-        num_notifications = CleaningRequest.objects.filter(
-            property__homeowner__user=request.user,
-            status=CleaningRequestStatus.PENDING_REVIEW
-        ).count()
-
-        return render(request, 'webapp/dashboard_homeowner.html', {
-            'user': request.user,
-            'property_data': property_data,
-            'num_notifications': num_notifications,
-        })
-    
-    def cleaner_dashboard(self, request):
-        listings = CleaningListing.objects.filter(cleaner=Cleaner.objects.get(user=request.user))
-        listing_data = [{
-            'listing': listing,
-            'requests': CleaningRequest.objects.filter(cleaning_listing=listing),
-        } for listing in listings]
-        num_notifications = CleaningRequest.objects.filter(
-            cleaning_listing__cleaner=Cleaner.objects.get(user=request.user)
-        ).filter(
-            Q(status=CleaningRequestStatus.PENDING_CLEANER_ACCEPT) |
-            Q(status=CleaningRequestStatus.PENDING_CLEANING)
-        ).count()
-        return render(request, 'webapp/dashboard_cleaner.html', {
-            'user': request.user,
-            'listing_data': listing_data,
-            'num_notifications': num_notifications,
-        })
-    
-    def platform_manager_dashboard(self, request):
-        def get_cleaner_stats(start_date: datetime):
-            return [{
-                'cleaner': cleaner,
-                'num_requests': CleaningRequest.objects.filter(
-                    Q(request_date__date__gte=start_date) & Q(cleaning_listing__cleaner=cleaner)
-                ).count(),
-                'views': CleaningListingView.objects.filter(
-                    Q(date_viewed__date__gte=start_date) & Q(cleaning_listing__cleaner=cleaner)
-                ).count(),
-            } for cleaner in Cleaner.objects.all()]
-        
-        start_of_today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        daily_cleaner_stats = get_cleaner_stats(start_of_today)
-        monthly_cleaner_stats = get_cleaner_stats(start_of_today.replace(day=1))
-        yearly_cleaner_stats = get_cleaner_stats(start_of_today.replace(month=1, day=1))
-
-        data = {
-            'user': request.user,
-            'new_users': CustomUser.objects.order_by('-date_joined')[:3],
-            'overall_stats': {
-                'cleaner': {
-                    'users': Cleaner.objects.count(),
-                    'listings': CleaningListing.objects.count(),
-                    'requests': CleaningRequest.objects.count(),
-                },
-                'homeowner': {
-                    'users': Homeowner.objects.count(),
-                    'properties': Property.objects.count(),
-                },
-            },
-            'reports': {
-                'daily': {
-                    'registrations': CustomUser.objects.filter(date_joined__date=start_of_today).count(),
-                    'top_3_viewed': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
-                    'top_3_requested': sorted(daily_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
-                },
-                'monthly': {
-                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(day=1)).count(),
-                    'top_3_viewed': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
-                    'top_3_requested': sorted(monthly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
-                },
-                'yearly': {
-                    'registrations': CustomUser.objects.filter(date_joined__date__gte=start_of_today.replace(month=1, day=1)).count(),
-                    'top_3_viewed': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['views'], reverse=True)[:3],
-                    'top_3_requested': sorted(yearly_cleaner_stats, key=lambda cleaner: cleaner['num_requests'], reverse=True)[:3],
-                },
-            },
-        }
-        
-        return render(request, 'webapp/dashboard_platformmanager.html', data)
+    def render_platform_manager_dashboard(self, user, request):
+        platform_manager = PlatformManager.objects.get(user=user)
+        data = platform_manager.get_dashboard_data()
+        return render(request, 'webapp/dashboard_platformmanager.html', {'user': user, **data})
 
 class ViewProfileView(LoginRequiredMixin, View):
     def get(self, request):
