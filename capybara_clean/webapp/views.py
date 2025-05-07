@@ -85,21 +85,14 @@ class ViewUserProfile(LoginRequiredMixin, View):
         data = UserProfile().get_profile_info(request)
         return render(request, 'webapp/view_profile.html', data)
 
-class CleanerProfile(LoginRequiredMixin, View):
+class BrowseCleaners(LoginRequiredMixin, View):
     def get(self, request, pk):
-        cleaner = get_object_or_404(Cleaner, pk=pk)
-        is_favourited = Homeowner.objects.get(user=request.user).favourite_cleaners.contains(cleaner)
-        return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
-    
+        data = Homeowner.get_homeowner(request).get_cleaner_profile_data(pk)
+        return render(request, 'webapp/cleaner_profile.html', data)
+
     def post(self, request, pk):
-        favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners
-        cleaner = get_object_or_404(Cleaner, pk=pk)
-        if favourite_cleaners.contains(cleaner):
-            favourite_cleaners.remove(cleaner)
-        else:
-            favourite_cleaners.add(cleaner)
-        is_favourited = favourite_cleaners.contains(cleaner)
-        return render(request, 'webapp/cleaner_profile.html', {'cleaner': cleaner, 'is_favourited': is_favourited})
+        data = Homeowner.get_homeowner(request).update_cleaner_favourite(pk)
+        return render(request, 'webapp/cleaner_profile.html', data)
 
 class PropertyCreateView(LoginRequiredMixin, View):
     def get(self, request):

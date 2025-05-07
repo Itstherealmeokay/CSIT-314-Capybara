@@ -14,7 +14,7 @@ urlpatterns = [
     path('view_profile/', views.ViewUserProfile.as_view(), name='view_profile'),
 
     path('browsecleaners/', views.browse_cleaners, name='browsecleaners'),
-    path('cleaner/<int:pk>/', views.CleanerProfile.as_view(), name='cleaner_profile'),
+    path('cleaner/<int:pk>/', views.BrowseCleaners.as_view(), name='cleaner_profile'),
     path('browsecleaninglistings/', views.cleaning_listings_browse, name='cleaning_listings_browse'),
     path('cleaner/listings/create/', views.cleaning_listing_create, name='cleaning_listing_create'),
     path('cleaner/listings/<int:listing_id>/', views.cleaning_listing_view, name='cleaning_listing_view'),

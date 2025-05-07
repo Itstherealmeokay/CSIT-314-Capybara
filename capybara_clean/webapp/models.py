@@ -4,6 +4,7 @@ from django.conf import settings
 import django.utils.timezone
 from datetime import datetime
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import authenticate
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -104,6 +105,38 @@ class Homeowner(UserProfile):
         return {
             'property_data': property_data,
             'num_notifications': num_notifications
+        }
+    
+    
+    @classmethod
+    def get_homeowner(cls, request):
+        return cls.objects.get(user=request.user)
+    
+    def is_cleaner_favourited(self,cleaner):
+        return self.favourite_cleaners.filter(pk=cleaner.pk).exists()
+    
+    def toggle_favourite_cleaner(self, cleaner):
+        if self.is_cleaner_favourited(cleaner):
+            self.favourite_cleaners.remove(cleaner)
+            return False
+        else:
+            self.favourite_cleaners.add(cleaner)
+            return True
+    
+    def get_cleaner_profile_data(self, cleaner_pk):
+        cleaner = get_object_or_404(Cleaner, pk=cleaner_pk)
+        is_favourited = self.is_cleaner_favourited(cleaner)
+        return {
+            'cleaner': cleaner,
+            'is_favourited': is_favourited
+        }
+        
+    def update_cleaner_favourite(self, cleaner_pk):
+        cleaner = get_object_or_404(Cleaner, pk=cleaner_pk)
+        is_favourited = self.toggle_favourite_cleaner(cleaner)
+        return {
+            'cleaner': cleaner,
+            'is_favourited': is_favourited
         }
 class Cleaner(UserProfile):
      def get_dashboard_data(self):
