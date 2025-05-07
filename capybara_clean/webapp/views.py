@@ -61,20 +61,17 @@ class LoginView(View):
         return render(request, 'webapp/login.html', {'form': LoginForm()})
 
     def post(self, request):
-        form = LoginForm()
+        form = LoginForm(request.POST)
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            if hasattr(user, 'is_suspended') and user.is_suspended:
-                messages.error(request, 'Your account has been suspended.')
-                return render(request, 'webapp/login.html', {'form': form})
-            auth.login(request, user)
-            return redirect('dashboard')
-        else:
-            messages.error(request, 'Invalid username or password.')
-            return render(request, 'webapp/login.html', {'form': form})
 
+        user, error_message = CustomUser.authenticate_user(username, password)
+        if user:
+            auth.login(request, user)
+            return redirect(user.get_dashboard_url())
+        else:
+            messages.error(request, error_message)
+            return render(request, 'webapp/login.html', {'form': form})
 class Dashboard(LoginRequiredMixin, View):
     login_url = 'login'
 

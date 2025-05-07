@@ -4,6 +4,8 @@ from django.conf import settings
 import django.utils.timezone
 from datetime import datetime
 from django.db.models import Q
+from django.contrib.auth import authenticate
+from django.urls import reverse
 
 
 class CustomUser(AbstractUser):
@@ -14,6 +16,34 @@ class CustomUser(AbstractUser):
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_suspended = models.BooleanField(default=False)
+    
+    def is_eligible_for_login(self):
+        if self.is_suspended:
+            return False, "Your account has been suspended."
+        return True, None
+    
+    def get_dashboard_url(self):
+        if self.is_staff:
+            return reverse('admin:index')
+        elif self.role == 'homeowner':
+            return reverse('dashboard')  # Dashboard view auto-routes by role
+        elif self.role == 'cleaner':
+            return reverse('dashboard')
+        elif self.role == 'platform_manager':
+            return reverse('dashboard')
+        else:
+            return reverse('login')
+
+    @classmethod
+    def authenticate_user(cls, username, password):
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            eligible, reason = user.is_eligible_for_login()
+            if not eligible:
+                return None, reason
+            return user, None
+        return None, "Invalid username or password."
+    
 
 #Profile
 
