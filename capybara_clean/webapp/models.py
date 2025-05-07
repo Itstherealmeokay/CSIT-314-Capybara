@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import django.utils.timezone
 from datetime import datetime
+from django.db.models import Q
+
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -78,6 +80,13 @@ class CleaningRequestStatus(models.TextChoices):
     DECLINED = 'declined'
     COMPLETED = 'completed'
 
+
+
+
+
+from django.db import models
+from django.db.models import Q
+
 class CleaningRequest(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE, null=True)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, null=True)
@@ -88,4 +97,17 @@ class CleaningRequest(models.Model):
 
     def __str__(self):
         return f'{self.cleaning_listing.name} on {self.property.address} - {self.status}'
+
+    @classmethod
+    def get_filtered_requests(cls, user, search_query=''):
+        queryset = cls.objects.filter(property__homeowner__user=user)
+        if search_query:
+            queryset = queryset.filter(
+                Q(cleaning_listing__cleaner__full_name__icontains=search_query) |
+                Q(cleaning_listing__name__icontains=search_query) |
+                Q(request_date__icontains=search_query) |
+                Q(status__icontains=search_query)
+            )
+        return queryset.order_by('-request_date')
+
 
