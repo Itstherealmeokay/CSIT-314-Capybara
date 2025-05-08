@@ -34,9 +34,9 @@ urlpatterns = [
     path('property/<int:property_id>/update', views.PropertyUpdateView.as_view(), name='property_update'),
     path('property/<int:property_id>/delete', views.PropertyDeleteView.as_view(), name='property_delete'),
 
-    path('service_category/create/', views.service_category_create, name='service_category_create'),
-    path('service_category/', views.service_category_view, name='service_category_view'),
-    path('service_category/<int:category_id>/delete/', views.service_category_delete, name='service_category_delete'),
+    path('service_category/create/', views.ServiceCategoryCreate.as_view(), name='service_category_create'),
+    path('service_category/', views.ServiceCategoryList.as_view(), name='service_category_view'),
+    path('service_category/<int:category_id>/delete/', views.ServiceCategoryDelete.as_view(), name='service_category_delete'),
 ]
 
 

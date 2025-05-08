@@ -281,37 +281,33 @@ def cleaning_request_completed(request, request_id):
     cleaning_request.save()
     return redirect('dashboard')
 
-@login_required(login_url='login')
-def service_category_create(request):
-    if request.user.role != 'platform_manager':
-        return redirect('dashboard')
-    
-    if request.method == 'POST':
-        form = ServiceCategoryForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            if ServiceCategory.objects.filter(name=name).exists():
-                messages.error(request, 'Service category already exists.')
-            else:
-                form.save()
-                messages.success(request, 'Service category added successfully.')
-                return redirect('service_category_view')
-            
-    else:
-        form = ServiceCategoryForm()
-        
-    return render(request, 'webapp/service_category_create.html', {'form': form})
+class ServiceCategoryCreate(LoginRequiredMixin, View):
+    login_url = 'login'
 
-@login_required(login_url='login')
-def service_category_view(request):
-    categories = ServiceCategory.objects.all()
-    return render(request, 'webapp/service_category_view.html', {'categories': categories})
+    def get(self, request):
+        context = ServiceCategory.get_create_context(request)
+        return render(request, 'webapp/service_category_create.html', context)
 
-@login_required(login_url='login')
-def service_category_delete(request, category_id):
-    category = get_object_or_404(ServiceCategory, id=category_id)
-    category.delete()
-    return redirect('service_category_view')
+    def post(self, request):
+        context = ServiceCategory.handle_create_submission(request)
+        if context.get('redirect'):
+            return redirect(context['redirect'])
+        return render(request, 'webapp/service_category_create.html', context)
+
+
+class ServiceCategoryList(LoginRequiredMixin, View):
+    login_url = 'login'
+    def get(self, request):
+        context = ServiceCategory.get_list_context()
+        return render(request, 'webapp/service_category_view.html', context)
+
+
+class ServiceCategoryDelete(LoginRequiredMixin, View):
+    login_url = 'login'
+    def post(self, request, category_id):
+        context = ServiceCategory.handle_delete(request, category_id)
+        return redirect(context.get('redirect', 'service_category_view'))
+
 
     
 def logout(request):

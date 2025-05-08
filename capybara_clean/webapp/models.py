@@ -330,6 +330,43 @@ class ServiceCategory(models.Model):
     
     def __str__(self):
         return self.name
+    
+    @classmethod
+    def get_create_context(cls, request):
+        from .forms import ServiceCategoryForm
+        if request.user.role != 'platform_manager':
+            return {'redirect': 'dashboard'}
+        return {'form': ServiceCategoryForm()}
+
+    @classmethod
+    def handle_create_submission(cls, request):
+        if request.user.role != 'platform_manager':
+            return {'redirect': 'dashboard'}
+        from .forms import ServiceCategoryForm
+        from django.contrib import messages
+        form = ServiceCategoryForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            if cls.objects.filter(name=name).exists():
+                messages.error(request, 'Service category already exists.')
+            else:
+                form.save()
+                messages.success(request, 'Service category added successfully.')
+                return {'redirect': 'service_category_view'}
+        return {'form': form}
+    
+    @classmethod
+    def get_list_context(cls):
+        return {'categories': cls.objects.all()}
+
+    @classmethod
+    def handle_delete(cls, request, category_id):
+        if request.user.role != 'platform_manager':
+            return {'redirect': 'dashboard'}
+
+        category = get_object_or_404(cls, id=category_id)
+        category.delete()
+        return {'redirect': 'service_category_view'}
 
 class CleaningListingStatus(models.TextChoices):
     OPEN = 'open'
