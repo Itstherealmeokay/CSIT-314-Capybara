@@ -172,18 +172,19 @@ class HomeViewListings(LoginRequiredMixin, View):
         return render(request, 'webapp/homeviewlisting.html', context)
 
 
-@login_required(login_url='login')
-def cleaning_listing_update(request, listing_id):
-    listing = get_object_or_404(CleaningListing, id=listing_id)
-    if request.method == 'POST':
-        form = CleaningListingForm(request.POST, instance=listing)
-        if form.is_valid():
-            form.save()
-            return redirect('cleaning_listings_browse')
-    else:
-        form = CleaningListingForm(instance=listing)
+class CleaningListingUpdate(LoginRequiredMixin, View):
+    login_url = 'login'
 
-    return render(request, 'webapp/cleaning_listing_update.html', {'form': form})
+    def get(self, request, listing_id):
+        context = CleaningListing.get_update_context(request, listing_id)
+        return render(request, 'webapp/cleaning_listing_update.html', context)
+
+    def post(self, request, listing_id):
+        context = CleaningListing.post_update_context(request, listing_id)
+        if 'redirect' in context:
+            return redirect(context['redirect'])
+        return render(request, 'webapp/cleaning_listing_update.html', context)
+
 
 @login_required(login_url='login')
 def cleaning_listing_favourite(request, listing_id):

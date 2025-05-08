@@ -446,7 +446,25 @@ class CleaningListing(models.Model):
             'listings': listings,
         }
 
-    
+
+
+    @classmethod
+    def get_update_context(cls, request, listing_id):
+        from .forms import CleaningListingForm
+        listing = get_object_or_404(cls, id=listing_id)
+        form = CleaningListingForm(instance=listing)
+        return {'form': form}
+
+    @classmethod
+    def post_update_context(cls, request, listing_id):
+        from .forms import CleaningListingForm
+        listing = get_object_or_404(cls, id=listing_id)
+        form = CleaningListingForm(request.POST, instance=listing)
+        if form.is_valid():
+            form.save()
+            return {'redirect': 'cleaning_listings_browse'}
+        return {'form': form}
+
 class CleaningListingView(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
     date_viewed = models.DateTimeField(default=django.utils.timezone.now)
