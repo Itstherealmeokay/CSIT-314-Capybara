@@ -190,6 +190,60 @@ class Homeowner(UserProfile):
             return 'webapp/view_profile.html', dashboard_data
 
         return 'webapp/property_update.html', {'form': form}
+    
+    @classmethod
+    def get_cleaner_browser_data(cls, request):
+        homeowner = cls.objects.get(user=request.user)
+        query = request.GET.get('q', '').strip()
+        fav_query = request.GET.get('fq', '').strip()
+
+        cleaners = Cleaner.objects.all()
+        favourite_cleaners = homeowner.favourite_cleaners.all()
+
+        if query:
+            cleaners = cleaners.filter(
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                Q(full_name__icontains=query)
+            )
+
+        if fav_query:
+            favourite_cleaners = favourite_cleaners.filter(
+                Q(user__first_name__icontains=fav_query) |
+                Q(user__last_name__icontains=fav_query) |
+                Q(full_name__icontains=fav_query)
+            )
+
+        paginator = Paginator(cleaners, 8)
+        page_number = request.GET.get('page')
+        
+        try:
+            cleaners_page = paginator.page(page_number)
+        except PageNotAnInteger:
+            cleaners_page = paginator.page(1)
+        except EmptyPage:
+            cleaners_page = paginator.page(paginator.num_pages)
+
+        context = {
+            'cleaners': cleaners_page,
+            'query': query,
+            'favourite_cleaners': favourite_cleaners,
+            'favourite_query': fav_query
+        }
+
+        return 'webapp/browsecleaners.html', context
+
+    @classmethod
+    def handle_cleaner_favourite_removal(cls, request):
+        homeowner = cls.objects.get(user=request.user)
+        cleaner_id = request.POST.get('cleaner_id')
+
+        if cleaner_id:
+            cleaner = Cleaner.objects.filter(id=cleaner_id).first()
+            if cleaner:
+                homeowner.favourite_cleaners.remove(cleaner)
+
+        return cls.get_cleaner_browser_data(request)
 
 
 

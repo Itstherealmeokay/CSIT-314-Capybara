@@ -127,49 +127,14 @@ class PropertyDeleteView(LoginRequiredMixin, View):
 
 
 
-@login_required(login_url='login')
-def browse_cleaners(request):
-    query = request.GET.get('q')
-    fav_query = request.GET.get('fq')
-    homeowner = Homeowner.objects.get(user=request.user)
-    cleaners = Cleaner.objects.all()
-    favourite_cleaners = Homeowner.objects.get(user=request.user).favourite_cleaners.all()
-    
-    #remove from favourites
-    if request.method == 'POST':
-        cleaner_id = request.POST.get('cleaner_id')
-        cleaner = Cleaner.objects.get(id=cleaner_id)
-        homeowner.favourite_cleaners.remove(cleaner)
-        return redirect('browsecleaners')
+class BrowseCleanersView(LoginRequiredMixin, View):
+    login_url = 'login'
 
-    if query:
-        query = query.strip()
-        cleaners = Cleaner.objects.filter(
-            Q(user__first_name__icontains=query) |
-            Q(user__last_name__icontains=query) |
-            Q(full_name__icontains=query) 
-        )
-        
-    if fav_query:
-        fav_query = fav_query.strip()
-        favourite_cleaners = favourite_cleaners.filter(
-            Q(user__first_name__icontains=fav_query) |
-            Q(user__last_name__icontains=fav_query) |
-            Q(full_name__icontains=fav_query) 
-        )
-        
-    paginator = Paginator(cleaners, 8)
-    page_number = request.GET.get('page')
-    
-    try:
-        cleaners = paginator.page(page_number)
-    except PageNotAnInteger:
-        cleaners = paginator.page(1)
-    except EmptyPage:
-        cleaners = paginator.page(paginator.num_pages)
-    
+    def get(self, request):
+        return render(request, *Homeowner.get_cleaner_browser_data(request))
 
-    return render(request, 'webapp/browsecleaners.html', {'cleaners': cleaners, 'query': query, 'favourite_cleaners': favourite_cleaners, 'favourite_query': fav_query})
+    def post(self, request):
+        return render(request, *Homeowner.handle_cleaner_favourite_removal(request))
 
 @login_required(login_url='login')
 def cleaning_listings_browse(request):
