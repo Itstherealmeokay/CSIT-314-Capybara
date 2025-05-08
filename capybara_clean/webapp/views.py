@@ -136,44 +136,13 @@ class BrowseCleanersView(LoginRequiredMixin, View):
     def post(self, request):
         return render(request, *Homeowner.handle_cleaner_favourite_removal(request))
 
-@login_required(login_url='login')
-def cleaning_listings_browse(request):
-    if request.user.role not in ('homeowner', 'cleaner'):
-        return redirect('dashboard')  # prevent unauthorized access
+class CleaningListingsBrowse(LoginRequiredMixin, View):
+    def get(self, request):
+        data = CleaningListing.get_browse_context(request)
+        if 'redirect' in data:
+            return redirect(data['redirect'])
+        return render(request, 'webapp/cleaning_listings_browse.html', data)
 
-    if request.method == 'GET' and request.GET.get('q'):
-        query = request.GET.get('q').strip()
-        listings = CleaningListing.objects.filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query) |
-            Q(service_category__name__icontains=query)
-        )
-    else:
-        listings = CleaningListing.objects.all()
-    listings = [{
-        'listing': listing,
-        'views': CleaningListingView.objects.filter(cleaning_listing=listing).count(),
-        'rating': CleaningRequest.objects.filter(cleaning_listing=listing).aggregate(Avg('rating'))['rating__avg'],
-    } for listing in listings]
-    
-    
-    
-    paginator = Paginator(listings, 8)
-    page_number = request.GET.get('page')
-    
-    try:
-        listings = paginator.page(page_number)
-    except PageNotAnInteger:
-        listings = paginator.page(1)
-    except EmptyPage:
-        listings = paginator.page(paginator.num_pages)
-
-    data = {
-        "listings": listings,
-        'query': request.GET.get('q'),
-        'page': request.GET.get('page'),
-    }
-    return render(request, 'webapp/cleaning_listings_browse.html', data)
 
 @login_required(login_url='login')
 def cleaning_listing_view(request, listing_id):

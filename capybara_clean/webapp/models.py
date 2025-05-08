@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import django.utils.timezone
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.shortcuts import get_object_or_404, redirect,render
 from django.contrib.auth import authenticate
 from django.urls import reverse
@@ -348,6 +348,59 @@ class CleaningListing(models.Model):
 
     def __str__(self):
         return f'{self.cleaner.full_name} - {self.service_category} [{self.price}] ({self.status})'
+    
+    @classmethod
+    def get_browse_context(cls, request):
+        if request.user.role not in ('homeowner', 'cleaner'):
+            return {'redirect': 'dashboard'}
+
+        query = request.GET.get('q')
+        page = request.GET.get('page')
+
+        listings = cls._filter_listings(query)
+        enriched = cls._add_metadata(listings)
+        paginated = cls._paginate(enriched, page)
+
+        return {
+            "listings": paginated,
+            "query": query,
+            "page": page,
+        }
+
+    @classmethod
+    def _filter_listings(cls, query):
+        if query:
+            query = query.strip()
+            return cls.objects.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query) |
+                Q(service_category__name__icontains=query)
+            )
+        return cls.objects.all()
+
+    @classmethod
+    def _add_metadata(cls, listings):
+        return [{
+            'listing': listing,
+            'views': listing.view_count(),
+            'rating': listing.average_rating(),
+        } for listing in listings]
+
+    @classmethod
+    def _paginate(cls, listings, page_number):
+        paginator = Paginator(listings, 8)
+        try:
+            return paginator.page(page_number)
+        except PageNotAnInteger:
+            return paginator.page(1)
+        except EmptyPage:
+            return paginator.page(paginator.num_pages)
+
+    def view_count(self):
+        return self.cleaninglistingview_set.count()
+
+    def average_rating(self):
+        return self.requests.aggregate(Avg('rating'))['rating__avg']
     
 class CleaningListingView(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
