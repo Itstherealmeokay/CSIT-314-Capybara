@@ -402,6 +402,19 @@ class CleaningListing(models.Model):
     def average_rating(self):
         return self.requests.aggregate(Avg('rating'))['rating__avg']
     
+    def get_detail_context_for_user(self, user):
+        is_favourited = False
+        if user.role == 'homeowner':
+            homeowner = Homeowner.objects.get(user=user)
+            CleaningListingView.objects.create(cleaning_listing=self, homeowner=homeowner)
+            is_favourited = homeowner.favourite_listings.filter(id=self.id).exists()
+        
+        return {
+            'listing': self,
+            'belongs_to_user': user == self.cleaner.user,
+            'is_homeowner_favourited': is_favourited,
+    }
+    
 class CleaningListingView(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
     date_viewed = models.DateTimeField(default=django.utils.timezone.now)

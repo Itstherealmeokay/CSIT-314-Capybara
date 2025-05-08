@@ -144,20 +144,11 @@ class CleaningListingsBrowse(LoginRequiredMixin, View):
         return render(request, 'webapp/cleaning_listings_browse.html', data)
 
 
-@login_required(login_url='login')
-def cleaning_listing_view(request, listing_id):
-    listing = get_object_or_404(CleaningListing, id=listing_id)
-    is_homeowner_favourited = False
-    if request.user.role == 'homeowner':
-        new_view = CleaningListingView.objects.create(cleaning_listing=listing, homeowner=Homeowner.objects.get(user=request.user))
-        new_view.save()
-        is_homeowner_favourited = Homeowner.objects.get(user=request.user).favourite_listings.filter(id=listing_id).exists()
-    data = {
-        'listing': listing,
-        'belongs_to_user': request.user == listing.cleaner.user,
-        'is_homeowner_favourited': is_homeowner_favourited,
-    }
-    return render(request, 'webapp/cleaning_listing_view.html', data)
+class CleaningListingDetailView(LoginRequiredMixin, View):
+    def get(self, request, listing_id):
+        listing = get_object_or_404(CleaningListing, id=listing_id)
+        context = listing.get_detail_context_for_user(request.user)
+        return render(request, 'webapp/cleaning_listing_view.html', context)
 
 @login_required(login_url='login')
 def cleaning_listing_create(request):
