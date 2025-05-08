@@ -2,11 +2,11 @@
 
 {%block content%}
 <h3> Welcome to your Homeowner Dashboard, {{user}}</h3>
-
+<hr>
 {% if dash.num_notifications %}
     <div class="card border-info shadow-sm mb-5">
         <div class="card-body">
-            <h5 class="card-title text-info">You have {{ num_notifications }} items pending action</h5>
+            <h5 class="card-title text-info">You have {{ dash.num_notifications }} items pending action</h5>
         </div>
     </div>
 {% endif %}
