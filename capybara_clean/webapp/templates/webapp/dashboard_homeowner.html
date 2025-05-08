@@ -26,7 +26,10 @@
             </div>
             <div>
                 <a href="{% url 'property_update' data.property.id %}" class="btn btn-sm btn-info">Update</a>
-                <a href="{% url 'property_delete' data.property.id %}" class="btn btn-sm btn-danger">Delete</a>
+                <form method="POST" action="{% url 'property_delete' data.property.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
             </div>
         </div>
 

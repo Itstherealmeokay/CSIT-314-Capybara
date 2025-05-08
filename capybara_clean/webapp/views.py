@@ -129,7 +129,9 @@ class PropertyDeleteView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def post(self, request, property_id):
-        return render(request, Homeowner.delete_property_by_id(request, property_id))
+        Homeowner.delete_property_by_id(request, property_id)
+        return redirect('view_profile')
+
 
 
 

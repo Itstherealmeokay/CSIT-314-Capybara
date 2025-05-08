@@ -166,10 +166,6 @@ class Homeowner(UserProfile):
         property = get_object_or_404(Property, id=property_id, homeowner=homeowner)
         property.delete()
 
-        dashboard_data = homeowner.get_dashboard_data(request)
-        dashboard_data['profile'] = homeowner
-        dashboard_data['properties'] = Property.objects.filter(homeowner=homeowner)
-        return 'webapp/view_profile.html', dashboard_data
 
 class Cleaner(UserProfile):
      def get_dashboard_data(self):

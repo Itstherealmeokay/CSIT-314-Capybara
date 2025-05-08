@@ -32,7 +32,11 @@
           <td>
             <div class="d-flex justify-content-end">
               <a href="{% url 'property_update' property.id %}" class="btn me-2 btn-info btn-sm">Update</a>
-              <a href="{% url 'property_delete' property.id %}" class="btn me-2 btn-danger btn-sm">Delete</a>
+              <form method="POST" action="{% url 'property_delete' property.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+              
             </div>
           </td>
         </tr>
