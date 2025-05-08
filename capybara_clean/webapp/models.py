@@ -138,6 +138,12 @@ class Homeowner(UserProfile):
             'cleaner': cleaner,
             'is_favourited': is_favourited
         }
+    @classmethod
+    def is_homeowner(cls, request):
+        if request.user.role == 'homeowner':
+            return 'webapp/property_create.html'
+        else:
+            return 'webapp/view_profile.html'
 class Cleaner(UserProfile):
      def get_dashboard_data(self):
         listings = self.cleaning_listings.all()

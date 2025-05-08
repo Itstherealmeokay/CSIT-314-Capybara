@@ -96,10 +96,9 @@ class BrowseCleaners(LoginRequiredMixin, View):
 
 class PropertyCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        if request.user.role != 'homeowner':
-            return redirect('view_profile')
+        webpage = Homeowner().is_homeowner(request)
         form = PropertyForm()
-        return render(request, 'webapp/property_create.html', {'form': form})
+        return render(request, webpage, {'form': form})
 
     def post(self, request):
         if request.user.role != 'homeowner':
