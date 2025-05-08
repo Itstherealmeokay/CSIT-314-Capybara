@@ -150,30 +150,27 @@ class CleaningListingDetailView(LoginRequiredMixin, View):
         context = listing.get_detail_context_for_user(request.user)
         return render(request, 'webapp/cleaning_listing_view.html', context)
 
-@login_required(login_url='login')
-def cleaning_listing_create(request):
-    if request.user.role != 'cleaner':
-        return redirect('dashboard')
+class CleaningListingCreate(LoginRequiredMixin, View):
+    def get(self, request):
+        context = CleaningListing.get_create_context(request)
+        if 'redirect' in context:
+            return redirect(context['redirect'])
+        return render(request, 'webapp/cleaning_listing_create.html', context)
 
-    if request.method == 'POST':
-        form = CleaningListingForm(request.POST)
-        if form.is_valid():
-            listing = form.save(commit=False)
-            listing.cleaner = Cleaner.objects.get(user=request.user)
-            listing.save()
-            return redirect('cleaning_listings_browse')
-    else:
-        form = CleaningListingForm()
+    def post(self, request):
+        context = CleaningListing.create_from_request(request)
+        if 'redirect' in context:
+            return redirect(context['redirect'])
+        return render(request, 'webapp/cleaning_listing_create.html', context)
 
-    return render(request, 'webapp/cleaning_listing_create.html', {'form': form})
 
 class HomeViewListings(LoginRequiredMixin, View):
     login_url = 'login'
-    
+
     def get(self, request, pk):
-        cleaner = get_object_or_404(Cleaner, pk=pk)
-        listings = CleaningListing.objects.filter(cleaner=cleaner)
-        return render(request, 'webapp/homeviewlisting.html', {'cleaner': cleaner, 'listings': listings})
+        context = CleaningListing.get_home_view_listing_context(pk)
+        return render(request, 'webapp/homeviewlisting.html', context)
+
 
 @login_required(login_url='login')
 def cleaning_listing_update(request, listing_id):

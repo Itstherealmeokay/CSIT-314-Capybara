@@ -414,6 +414,38 @@ class CleaningListing(models.Model):
             'belongs_to_user': user == self.cleaner.user,
             'is_homeowner_favourited': is_favourited,
     }
+        
+    @classmethod
+    def get_create_context(cls, request):
+        from .forms import CleaningListingForm
+        if request.user.role != 'cleaner':
+            return {'redirect': 'dashboard'}
+        return {'form': CleaningListingForm()}
+
+    @classmethod
+    def create_from_request(cls, request):
+        from .forms import CleaningListingForm
+        if request.user.role != 'cleaner':
+            return {'redirect': 'dashboard'}
+
+        form = CleaningListingForm(request.POST)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.cleaner = Cleaner.objects.get(user=request.user)
+            listing.save()
+            return {'redirect': 'cleaning_listings_browse'}
+        
+        return {'form': form}
+    
+    @classmethod
+    def get_home_view_listing_context(cls, cleaner_pk):
+        cleaner = get_object_or_404(Cleaner, pk=cleaner_pk)
+        listings = cls.objects.filter(cleaner=cleaner)
+        return {
+            'cleaner': cleaner,
+            'listings': listings,
+        }
+
     
 class CleaningListingView(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
