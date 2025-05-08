@@ -493,6 +493,47 @@ class CleaningListing(models.Model):
         redirect_url = request.POST.get('redirect') or 'cleaning_listings_browse'
         return {'redirect': redirect_url}
     
+    @classmethod
+    def get_application_context(cls, request, listing_id):
+        if request.user.role != 'homeowner':
+            return {'redirect': 'cleaning_listings_view', 'listing_id': listing_id}
+
+        from .forms import CleaningRequestForm
+        listing = cls.objects.get(id=listing_id)
+        homeowner = Homeowner.objects.get(user=request.user)
+
+        return {
+            'listing_id': listing_id,
+            'form': CleaningRequestForm(homeowner=homeowner)
+        }
+
+    @classmethod
+    def process_application_post(cls, request, listing_id):
+        if request.user.role != 'homeowner':
+            return {'redirect': 'cleaning_listings_view', 'listing_id': listing_id}
+
+        listing = cls.objects.get(id=listing_id)
+        homeowner = Homeowner.objects.get(user=request.user)
+
+        from .forms import CleaningRequestForm
+        form = CleaningRequestForm(request.POST, homeowner=homeowner)
+        if form.is_valid():
+            cleaning_request = form.save(commit=False)
+            cleaning_request.cleaning_listing = listing
+            cleaning_request.save()
+            return {'redirect': 'cleaning_listings_browse'}
+
+        return {
+            'listing_id': listing_id,
+            'form': form
+        }
+    @classmethod
+    def handle_delete(cls, request, listing_id):
+        listing = get_object_or_404(cls, id=listing_id)
+        # Optional: Add ownership check here if needed
+        listing.delete()
+        return 'cleaning_listings_browse'
+
     
     
 class CleaningListingView(models.Model):

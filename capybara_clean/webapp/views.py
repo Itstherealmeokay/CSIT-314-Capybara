@@ -194,31 +194,27 @@ class CleaningListingFavourite(LoginRequiredMixin, View):
         return redirect(context['redirect'])
 
 
-@login_required(login_url='login')
-def cleaning_listing_apply(request, listing_id):
-    if request.user.role != 'homeowner':
-        return redirect('cleaning_listings_view', listing_id)
+class ApplyCleaningListing(LoginRequiredMixin, View):
+    login_url = 'login'
     
-    cleaning_listing = CleaningListing.objects.get(id=listing_id)
-    homeowner = Homeowner.objects.get(user=request.user)
-    if request.method == 'POST':
-        form = CleaningRequestForm(request.POST, homeowner=homeowner)
-        if form.is_valid():
-            cleaning_request = form.save(commit=False)
-            cleaning_request.cleaning_listing = cleaning_listing
-            cleaning_request.save()
-            return redirect('cleaning_listings_browse')
-    data = {
-        'listing_id': listing_id,
-        'form': CleaningRequestForm(homeowner=homeowner)
-    }
-    return render(request, 'webapp/cleaning_listing_apply.html', data)
+    def get(self, request, listing_id):
+        context = CleaningListing.get_application_context(request, listing_id)
+        if 'redirect' in context:
+            return redirect(context['redirect'])
+        return render(request, 'webapp/cleaning_listing_apply.html', context)
 
-@login_required(login_url='login')
-def cleaning_listing_delete(request, listing_id):
-    listing = get_object_or_404(CleaningListing, id=listing_id) 
-    listing.delete()
-    return redirect('cleaning_listings_browse')
+    def post(self, request, listing_id):
+        context = CleaningListing.process_application_post(request, listing_id)
+        if 'redirect' in context:
+            return redirect(context['redirect'])
+        return render(request, 'webapp/cleaning_listing_apply.html', context)
+    
+class CleaningListingDelete(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def post(self, request, listing_id):
+        redirect_to = CleaningListing.handle_delete(request, listing_id)
+        return redirect(redirect_to)
 
 @login_required(login_url='login')
 def cleaning_request_accept(request, request_id):
