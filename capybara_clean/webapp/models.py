@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
+
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('homeowner', 'Homeowner'),
@@ -165,6 +166,31 @@ class Homeowner(UserProfile):
         homeowner = cls.objects.get(user=request.user)
         property = get_object_or_404(Property, id=property_id, homeowner=homeowner)
         property.delete()
+        
+    @classmethod
+    def get_property_update_form(cls, request, property_id):
+        from .forms import PropertyForm
+        homeowner = cls.objects.get(user=request.user)
+        property = get_object_or_404(Property, id=property_id, homeowner=homeowner)
+        form = PropertyForm(instance=property)
+        return 'webapp/property_update.html', {'form': form}
+
+    @classmethod
+    def update_property_from_post(cls, request, property_id):
+        from .forms import PropertyForm
+        homeowner = cls.objects.get(user=request.user)
+        property = get_object_or_404(Property, id=property_id, homeowner=homeowner)
+        form = PropertyForm(request.POST, instance=property)
+
+        if form.is_valid():
+            form.save()
+            dashboard_data = homeowner.get_dashboard_data(request)
+            dashboard_data['profile'] = homeowner
+            dashboard_data['properties'] = Property.objects.filter(homeowner=homeowner)
+            return 'webapp/view_profile.html', dashboard_data
+
+        return 'webapp/property_update.html', {'form': form}
+
 
 
 class Cleaner(UserProfile):

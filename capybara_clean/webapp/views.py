@@ -107,22 +107,14 @@ class PropertyCreateView(LoginRequiredMixin, View):
 
 
 class PropertyUpdateView(LoginRequiredMixin, View):
+    login_url = 'login'
+
     def get(self, request, property_id):
-        property = get_object_or_404(Property, id=property_id)
-        if property.homeowner.user != request.user:
-            return redirect('view_profile')
-        form = PropertyForm(instance=property)
-        return render(request, 'webapp/property_update.html', {'form': form})
+        return render(request, *Homeowner.get_property_update_form(request, property_id))
 
     def post(self, request, property_id):
-        property = get_object_or_404(Property, id=property_id)
-        if property.homeowner.user != request.user:
-            return redirect('view_profile')
-        form = PropertyForm(request.POST, instance=property)
-        if form.is_valid():
-            form.save()
-            return redirect('view_profile')
-        return render(request, 'webapp/property_update.html', {'form': form})
+        return render(request, *Homeowner.update_property_from_post(request, property_id))
+
     
 
 class PropertyDeleteView(LoginRequiredMixin, View):
