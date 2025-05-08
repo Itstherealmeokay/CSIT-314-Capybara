@@ -361,11 +361,20 @@ class CleaningListing(models.Model):
         enriched = cls._add_metadata(listings)
         paginated = cls._paginate(enriched, page)
 
-        return {
+        context = {
             "listings": paginated,
             "query": query,
             "page": page,
         }
+
+        if request.user.role == 'homeowner':
+            homeowner = Homeowner.objects.get(user=request.user)
+            favourite_listings = homeowner.favourite_listings.all()
+            favourite_data = cls._add_metadata(favourite_listings)
+            context['favourite_listings'] = favourite_data
+
+        return context
+
 
     @classmethod
     def _filter_listings(cls, query):
@@ -465,6 +474,27 @@ class CleaningListing(models.Model):
             return {'redirect': 'cleaning_listings_browse'}
         return {'form': form}
 
+    @classmethod
+    def handle_favourite_action(cls, request, listing_id):
+        listing = get_object_or_404(cls, id=listing_id)
+        user = request.user
+
+        if user.role != 'homeowner':
+            return {'redirect': 'cleaning_listings_view', 'listing_id': listing_id}
+
+        homeowner = Homeowner.objects.get(user=user)
+        action = 'add_favourite' in request.POST
+
+        if action:
+            homeowner.favourite_listings.add(listing)
+        else:
+            homeowner.favourite_listings.remove(listing)
+
+        redirect_url = request.POST.get('redirect') or 'cleaning_listings_browse'
+        return {'redirect': redirect_url}
+    
+    
+    
 class CleaningListingView(models.Model):
     cleaning_listing = models.ForeignKey(CleaningListing, on_delete=models.CASCADE)
     date_viewed = models.DateTimeField(default=django.utils.timezone.now)

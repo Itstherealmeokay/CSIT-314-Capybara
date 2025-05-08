@@ -21,7 +21,7 @@ urlpatterns = [
     path('cleaner/listings/<int:listing_id>/update', views.CleaningListingUpdate.as_view(), name='cleaning_listing_update'),
     path('cleaner/listings/<int:listing_id>/delete/', views.cleaning_listing_delete, name='cleaning_listing_delete'),
     path('cleaner/listings/<int:listing_id>/apply/', views.cleaning_listing_apply, name='cleaning_listing_apply'),
-    path('cleaner/listings/<int:listing_id>/favourite/', views.cleaning_listing_favourite, name='cleaning_listing_favourite'),
+    path('cleaner/listings/<int:listing_id>/favourite/', views.CleaningListingFavourite.as_view(), name='cleaning_listing_favourite'),
     path('cleaner/<int:pk>/listings/', views.HomeViewListings.as_view(), name='cleaner_listings_view'),
     path('request_history/', views.SearchRequestHistory.as_view(), name='request_history'),
 
