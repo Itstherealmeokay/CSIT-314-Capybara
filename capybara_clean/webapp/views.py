@@ -101,8 +101,9 @@ class PropertyCreateView(LoginRequiredMixin, View):
         return render(request, webpage, {'form': form})
 
     def post(self, request):
-        webpage, context = Homeowner.create_property_from_post(request)
-        return render(request, webpage, context)
+        redirect_response = Homeowner.create_property_from_post(request)
+        return redirect_response  # always redirect after successful POST
+
 
 
 class PropertyUpdateView(LoginRequiredMixin, View):
@@ -122,20 +123,14 @@ class PropertyUpdateView(LoginRequiredMixin, View):
             form.save()
             return redirect('view_profile')
         return render(request, 'webapp/property_update.html', {'form': form})
-
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
-from .models import Property
+    
 
 class PropertyDeleteView(LoginRequiredMixin, View):
     login_url = 'login'
+
     def post(self, request, property_id):
-        property = get_object_or_404(Property, id=property_id)
-        if property.homeowner.user != request.user:
-            return redirect('view_profile')
-        property.delete()
-        return redirect('view_profile')
+        return render(request, Homeowner.delete_property_by_id(request, property_id))
+
 
 
 @login_required(login_url='login')

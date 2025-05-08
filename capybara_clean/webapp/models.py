@@ -4,7 +4,7 @@ from django.conf import settings
 import django.utils.timezone
 from datetime import datetime
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect,render
 from django.contrib.auth import authenticate
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -145,20 +145,32 @@ class Homeowner(UserProfile):
         else:
             return 'webapp/view_profile.html'
         
-    @classmethod
-    def create_property_from_post(cls, request):
-        from .forms import PropertyForm  # local import to avoid circular imports
+    @staticmethod
+    def create_property_from_post(request):
+        if request.user.role != 'homeowner':
+            return redirect('view_profile')
+        from .forms import PropertyForm
         form = PropertyForm(request.POST)
         if form.is_valid():
-            homeowner = cls.objects.get(user=request.user)
             property = form.save(commit=False)
-            property.homeowner = cls.objects.get(user=request.user)
+            property.homeowner = Homeowner.objects.get(user=request.user)
             property.save()
-            dashboard_data = homeowner.get_dashboard_data(request)
-            dashboard_data['profile'] =  homeowner
-            dashboard_data['properties'] = Property.objects.filter(homeowner=homeowner) 
-            return 'webapp/view_profile.html', dashboard_data  
-        return 'webapp/property_create.html', {'form': form}
+            return redirect('view_profile')  # redirect to prevent duplicate submission
+
+        # On error, return render
+        return render(request, 'webapp/property_create.html', {'form': form})
+    
+    @classmethod
+    def delete_property_by_id(cls, request, property_id):
+        homeowner = cls.objects.get(user=request.user)
+        property = get_object_or_404(Property, id=property_id, homeowner=homeowner)
+        property.delete()
+
+        dashboard_data = homeowner.get_dashboard_data(request)
+        dashboard_data['profile'] = homeowner
+        dashboard_data['properties'] = Property.objects.filter(homeowner=homeowner)
+        return 'webapp/view_profile.html', dashboard_data
+
 class Cleaner(UserProfile):
      def get_dashboard_data(self):
         listings = self.cleaning_listings.all()
