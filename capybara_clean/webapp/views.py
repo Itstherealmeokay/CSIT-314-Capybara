@@ -101,15 +101,8 @@ class PropertyCreateView(LoginRequiredMixin, View):
         return render(request, webpage, {'form': form})
 
     def post(self, request):
-        if request.user.role != 'homeowner':
-            return redirect('view_profile')
-        form = PropertyForm(request.POST)
-        if form.is_valid():
-            property = form.save(commit=False)
-            property.homeowner = Homeowner.objects.get(user=request.user)
-            property.save()
-            return redirect('view_profile')
-        return render(request, 'webapp/property_create.html', {'form': form})
+        webpage, context = Homeowner.create_property_from_post(request)
+        return render(request, webpage, context)
 
 
 class PropertyUpdateView(LoginRequiredMixin, View):

@@ -144,6 +144,21 @@ class Homeowner(UserProfile):
             return 'webapp/property_create.html'
         else:
             return 'webapp/view_profile.html'
+        
+    @classmethod
+    def create_property_from_post(cls, request):
+        from .forms import PropertyForm  # local import to avoid circular imports
+        form = PropertyForm(request.POST)
+        if form.is_valid():
+            homeowner = cls.objects.get(user=request.user)
+            property = form.save(commit=False)
+            property.homeowner = cls.objects.get(user=request.user)
+            property.save()
+            dashboard_data = homeowner.get_dashboard_data(request)
+            dashboard_data['profile'] =  homeowner
+            dashboard_data['properties'] = Property.objects.filter(homeowner=homeowner) 
+            return 'webapp/view_profile.html', dashboard_data  
+        return 'webapp/property_create.html', {'form': form}
 class Cleaner(UserProfile):
      def get_dashboard_data(self):
         listings = self.cleaning_listings.all()
