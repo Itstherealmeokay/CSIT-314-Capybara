@@ -1,0 +1,44 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Welcome to Admin Dashboard, User {{ user }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>User List</h4>
+        <a href="{% url 'register' %}" class="btn btn-success">+ Create New User</a>
+    </div>
+    
+    <ul class="list-group">
+        {% for users in all_users %}
+            <li class="list-group-item">
+                <h5 class="mb-1">{{ users.username }}</h5>
+                <p class="mb-1"><strong>Role:</strong> {{ users.role }}</p>
+                <p class="mb-1"><strong>Date Joined:</strong> {{ users.date_joined|date:"Y-m-d H:i" }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between mt-4">
+        <div>
+            {% if all_users.has_previous %}
+                <a class="btn btn-primary btn-sm" href="?page=1">&laquo; First</a>
+                <a class="btn btn-primary btn-sm" href="?page={{ all_users.previous_page_number }}">Previous</a>
+            {% endif %}
+        </div>
+
+        <div>
+            <span class="text-muted">Page {{ all_users.number }} of {{ all_users.paginator.num_pages }}</span>
+        </div>
+
+        <div>
+            {% if all_users.has_next %}
+                <a class="btn btn-primary btn-sm" href="?page={{ all_users.next_page_number }}">Next</a>
+                <a class="btn btn-primary btn-sm" href="?page={{ all_users.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+
+    
+</div>
+{% endblock %}

@@ -16,6 +16,7 @@ class CustomUser(AbstractUser):
         ('homeowner', 'Homeowner'),
         ('cleaner', 'Cleaner'),
         ('platform_manager', 'Platform Manager'),
+        ('adminuser', 'Admin User'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_suspended = models.BooleanField(default=False)
@@ -33,6 +34,8 @@ class CustomUser(AbstractUser):
         elif self.role == 'cleaner':
             return reverse('dashboard')
         elif self.role == 'platform_manager':
+            return reverse('dashboard')
+        elif self.role == 'adminuser':
             return reverse('dashboard')
         else:
             return reverse('login')
@@ -78,7 +81,34 @@ class ViewDashboard(models.Model):
         elif user.role == 'cleaner':
             return Cleaner.objects.get(user=user).get_dashboard_data()        
         elif user.role == 'platform_manager':
-            return PlatformManager.objects.get(user=user).get_dashboard_data()  
+            return PlatformManager.objects.get(user=user).get_dashboard_data()
+        elif user.role == 'adminuser':
+            return AdminUser.objects.get(user=user).get_dashboard_data(request)  
+        
+#fake useradmin
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+class AdminUser(UserProfile):
+    def get_dashboard_data(self, request):
+        all_users = CustomUser.objects.all()  # Fetch all users
+        
+        # Pagination logic
+        page_number = request.GET.get('page', 1)  # Get page number from the request
+        paginator = Paginator(all_users, 10)  # Show 10 users per page
+        
+        try:
+            page_obj = paginator.page(page_number)  # Get the page object
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)  # If page is not an integer, show the first page
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)  # If page is out of range, show last page
+        
+        return {
+            'all_users': page_obj,  # Return the paginated result
+        }
+
+
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

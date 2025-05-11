@@ -38,6 +38,8 @@ class RegisterView(View):
             Cleaner.objects.create(user=user)
         elif role == 'platform_manager':
             PlatformManager.objects.create(user=user)
+        elif role == 'adminuser':
+            AdminUser.objects.create(user=user)
         return redirect('login')
     
 class EditProfileView(LoginRequiredMixin, View):

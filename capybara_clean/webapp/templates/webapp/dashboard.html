@@ -7,6 +7,8 @@
     {% include 'webapp/dashboard_cleaner.html' %}
   {% elif user.role == 'platform_manager' %}
     {% include 'webapp/dashboard_platformmanager.html' %}
+  {% elif user.role == 'adminuser' %}
+    {% include 'webapp/dashboard_adminuser.html' %}
   {% else %}
     <p>No dashboard available for your role.</p>
   {% endif %}

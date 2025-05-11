@@ -45,4 +45,5 @@ admin.site.register([
     ServiceCategory,
     CleaningListing,
     CleaningListingView,
+    AdminUser,
 ])
