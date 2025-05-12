@@ -12,7 +12,8 @@ urlpatterns = [
 
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('view_profile/', views.ViewUserProfile.as_view(), name='view_profile'),
-    
+    path('adminuserupdate/<int:user_id>/', views.AdminUserEditController.as_view(), name='adminuserupdate'),
+    #path('adminuser/<int:user_id>/edit/', views.AdminUserEditProfileView.as_view(), name='adminuseredit'),
     
     path('browsecleaners/', views.BrowseCleanersView.as_view(), name='browsecleaners'),
     path('cleaner/<int:pk>/', views.BrowseCleaners.as_view(), name='cleaner_profile'),

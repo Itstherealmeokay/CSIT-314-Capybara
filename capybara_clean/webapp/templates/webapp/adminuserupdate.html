@@ -1,18 +1,13 @@
-<!-- templates/adminuser/useradminupdate.html -->
 {% extends 'webapp/base.html' %}
-{% block content %}
-<div class="container mt-4">
-    <h4>Edit User ID: {{ user_id }}</h4>
-    <form method="post">
-        {% csrf_token %}
-        <h5>Account Info</h5>
-        {{ user_form.as_p }}
-        
-        <h5>Profile Info</h5>
-        {{ profile_form.as_p }}
+{% load crispy_forms_tags %}
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{% url 'adminuser_dashboard' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+{% block content %}
+  <h2>Editing Profile for: {{ editing_user.username }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <br>
+    <button type="submit" class="btn btn-success">Update Profile</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Admin Dashboard</a>
+  </form>
 {% endblock %}

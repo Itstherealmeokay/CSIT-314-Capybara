@@ -44,17 +44,28 @@ class RegisterView(View):
     
 class EditProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        form = UserProfileForm(instance=profile)
-        return render(request, 'webapp/edit_profile.html', {'form': form})
+        context = UserProfile.get_edit_context(request)
+        return render(request, 'webapp/edit_profile.html', context)
 
     def post(self, request):
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        form = UserProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
+        success, context = UserProfile.handle_edit_submission(request)
+        if success:
             return redirect('view_profile')
-        return render(request, 'webapp/edit_profile.html', {'form': form})
+        return render(request, 'webapp/edit_profile.html', context)
+
+
+class AdminUserEditController(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        context = UserProfile.get_admin_edit_context(user_id)
+        return render(request, 'webapp/adminuserupdate.html', context)
+
+    def post(self, request, user_id):
+        success, context = UserProfile.handle_admin_edit_submission(request, user_id)
+        if success:
+            return redirect('dashboard')  # Or wherever your admin dashboard is
+        return render(request, 'webapp/adminuserupdate.html', context)
+    
+
 
 
 

@@ -53,6 +53,8 @@ class CustomUser(AbstractUser):
 
 #Profile
 
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
@@ -71,6 +73,54 @@ class UserProfile(models.Model):
             'profile': profile,
             'properties': properties,
         }
+        
+    @classmethod
+    def get_edit_context(cls, request):
+        from .forms import UserProfileForm
+        profile, _ = cls.objects.get_or_create(user=request.user)
+        form = UserProfileForm(instance=profile)
+        return {
+            'form': form
+        }
+        
+
+    @classmethod
+    def handle_edit_submission(cls, request):
+        from .forms import UserProfileForm
+        profile, _ = cls.objects.get_or_create(user=request.user)
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return True, None
+        return False, {
+            'form': form
+        }
+        
+    @classmethod
+    def get_admin_edit_context(cls, user_id):
+        from .forms import UserProfileForm
+        user = get_object_or_404(CustomUser, id=user_id)
+        profile, _ = cls.objects.get_or_create(user=user)
+        form = UserProfileForm(instance=profile)
+        return {
+            'form': form,
+            'editing_user': user
+        }
+
+    @classmethod
+    def handle_admin_edit_submission(cls, request, user_id):
+        from .forms import UserProfileForm
+        user = get_object_or_404(CustomUser, id=user_id)
+        profile, _ = cls.objects.get_or_create(user=user)
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return True, None
+        return False, {
+            'form': form,
+            'editing_user': user
+        }
+    
 
 class ViewDashboard(models.Model):
     def get_dash(self, request):
@@ -118,19 +168,6 @@ class AdminUser(UserProfile):
             'query': query
         }
         
-    # @classmethod
-    # def edit_user(cls, request, user_id):
-    #     from .forms import UserProfileForm
-    #     user = CustomUser.objects.get(id=user_id)
-    #     profile = UserProfile.objects.get(user=user)
-    #     if request.method == 'POST':
-    #         form = UserProfileForm(request.POST, instance=profile)
-    #         if form.is_valid():
-    #             form.save()
-    #             return redirect('dashboard')
-    #     else:
-    #         form = UserProfileForm(instance=profile)
-    #     return render(request, 'webapp/edit_profile.html', {'form': form})
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)
