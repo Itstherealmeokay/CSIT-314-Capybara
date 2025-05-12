@@ -78,6 +78,10 @@ class AdminUserAccountEditView(LoginRequiredMixin, View):
         return render(request, 'webapp/adminuser_edit_account.html', {'form': result, 'user_obj': CustomUser.objects.get(id=user_id)})
 
 
+class AdminUserSuspendToggleView(LoginRequiredMixin, View):
+    def post(self, request, user_id):
+        AdminUser.toggle_suspension(user_id)
+        return redirect('dashboard')  # Or wherever your dashboard is
 
 
 

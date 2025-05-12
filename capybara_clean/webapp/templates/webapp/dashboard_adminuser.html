@@ -28,8 +28,17 @@
             <div>
                 <a href="{% url 'adminuserupdate' users.id %}" class="btn btn-sm btn-outline-secondary">Edit Profile</a>
                 <a href="{% url 'adminuser_edit_account' users.id %}" class="btn btn-sm btn-outline-primary">Edit Account</a>
-
+                <form method="post" action="{% url 'adminuser_suspend_toggle' users.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if users.is_suspended %}
+                        <button type="submit" class="btn btn-sm btn-warning">Unsuspend</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-sm btn-danger">Suspend</button>
+                    {% endif %}
+                </form>
             </div>
+        
+
         </li>
     {% endfor %}
 </ul>

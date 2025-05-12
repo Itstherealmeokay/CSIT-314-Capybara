@@ -188,6 +188,13 @@ class AdminUser(UserProfile):
             updated_user.save()
             return True, None  # success
         return False, form  # failed, return form with errors
+    
+    @classmethod
+    def toggle_suspension(cls, user_id):
+        user = CustomUser.objects.get(id=user_id)
+        user.is_suspended = not user.is_suspended
+        user.save()
+        return user.is_suspended
         
     
 class Homeowner(UserProfile):
