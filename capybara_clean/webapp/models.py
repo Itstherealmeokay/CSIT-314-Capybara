@@ -168,6 +168,27 @@ class AdminUser(UserProfile):
             'query': query
         }
         
+    @classmethod
+    def get_user_account_form(cls, user_id):
+        from .forms import AdminUserEditForm
+        user = CustomUser.objects.get(id=user_id)
+        form = AdminUserEditForm(instance=user)
+        return form, user
+
+    @classmethod
+    def save_user_account_form(cls, request, user_id):
+        from .forms import AdminUserEditForm
+        user = CustomUser.objects.get(id=user_id)
+        form = AdminUserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            updated_user = form.save(commit=False)
+            password1 = form.cleaned_data.get('password1')
+            if password1:
+                updated_user.set_password(password1)
+            updated_user.save()
+            return True, None  # success
+        return False, form  # failed, return form with errors
+        
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

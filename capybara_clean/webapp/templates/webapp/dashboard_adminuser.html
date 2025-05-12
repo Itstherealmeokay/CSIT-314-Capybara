@@ -27,6 +27,8 @@
             </div>
             <div>
                 <a href="{% url 'adminuserupdate' users.id %}" class="btn btn-sm btn-outline-secondary">Edit Profile</a>
+                <a href="{% url 'adminuser_edit_account' users.id %}" class="btn btn-sm btn-outline-primary">Edit Account</a>
+
             </div>
         </li>
     {% endfor %}

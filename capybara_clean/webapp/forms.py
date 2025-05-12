@@ -24,6 +24,27 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['full_name', 'address', 'phone_number']
+        
+from django import forms
+from .models import CustomUser
+
+class AdminUserEditForm(forms.ModelForm):
+    password1 = forms.CharField(label='New Password', widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 or password2:
+            if password1 != password2:
+                raise forms.ValidationError("Passwords do not match.")
+        return cleaned_data
+
 
 class PropertyForm(forms.ModelForm):
     class Meta:

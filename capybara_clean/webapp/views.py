@@ -66,6 +66,17 @@ class AdminUserEditController(LoginRequiredMixin, View):
         return render(request, 'webapp/adminuserupdate.html', context)
     
 
+class AdminUserAccountEditView(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        form, user_obj = AdminUser.get_user_account_form(user_id)
+        return render(request, 'webapp/adminuser_edit_account.html', {'form': form, 'user_obj': user_obj})
+
+    def post(self, request, user_id):
+        success, result = AdminUser.save_user_account_form(request, user_id)
+        if success:
+            return redirect('dashboard')
+        return render(request, 'webapp/adminuser_edit_account.html', {'form': result, 'user_obj': CustomUser.objects.get(id=user_id)})
+
 
 
 
