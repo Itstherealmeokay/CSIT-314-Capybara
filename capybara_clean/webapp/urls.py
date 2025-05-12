@@ -12,7 +12,8 @@ urlpatterns = [
 
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('view_profile/', views.ViewUserProfile.as_view(), name='view_profile'),
-
+    
+    
     path('browsecleaners/', views.BrowseCleanersView.as_view(), name='browsecleaners'),
     path('cleaner/<int:pk>/', views.BrowseCleaners.as_view(), name='cleaner_profile'),
     path('browsecleaninglistings/', views.CleaningListingsBrowse.as_view(), name='cleaning_listings_browse'),

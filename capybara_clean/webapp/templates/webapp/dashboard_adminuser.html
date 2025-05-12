@@ -8,6 +8,15 @@
         <a href="{% url 'register' %}" class="btn btn-success">+ Create New User</a>
     </div>
     
+
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search by username..." value="{{ query }}">
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+        </div>
+    </form>
+
+
     <ul class="list-group">
         {% for users in all_users %}
             <li class="list-group-item">

@@ -90,12 +90,21 @@ class ViewDashboard(models.Model):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class AdminUser(UserProfile):
-    def get_dashboard_data(self, request):
+    @classmethod
+    def get_dashboard_data(cls, request):
+        query = request.GET.get('q', '')
         all_users = CustomUser.objects.all()  # Fetch all users
+        
+        if query:
+            all_users = all_users.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(username__icontains=query)
+            )
         
         # Pagination logic
         page_number = request.GET.get('page', 1)  # Get page number from the request
-        paginator = Paginator(all_users, 10)  # Show 10 users per page
+        paginator = Paginator(all_users, 5)  # Show 10 users per page
         
         try:
             page_obj = paginator.page(page_number)  # Get the page object
@@ -106,9 +115,22 @@ class AdminUser(UserProfile):
         
         return {
             'all_users': page_obj,  # Return the paginated result
+            'query': query
         }
-
-
+        
+    # @classmethod
+    # def edit_user(cls, request, user_id):
+    #     from .forms import UserProfileForm
+    #     user = CustomUser.objects.get(id=user_id)
+    #     profile = UserProfile.objects.get(user=user)
+    #     if request.method == 'POST':
+    #         form = UserProfileForm(request.POST, instance=profile)
+    #         if form.is_valid():
+    #             form.save()
+    #             return redirect('dashboard')
+    #     else:
+    #         form = UserProfileForm(instance=profile)
+    #     return render(request, 'webapp/edit_profile.html', {'form': form})
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

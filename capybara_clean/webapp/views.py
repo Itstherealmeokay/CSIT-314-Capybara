@@ -57,6 +57,9 @@ class EditProfileView(LoginRequiredMixin, View):
         return render(request, 'webapp/edit_profile.html', {'form': form})
 
 
+
+
+
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -105,7 +108,6 @@ class PropertyCreateView(LoginRequiredMixin, View):
     def post(self, request):
         redirect_response = Homeowner.create_property_from_post(request)
         return redirect_response  # always redirect after successful POST
-
 
 
 class PropertyUpdateView(LoginRequiredMixin, View):
