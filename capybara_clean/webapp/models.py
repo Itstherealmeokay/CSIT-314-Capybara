@@ -144,6 +144,7 @@ class AdminUser(UserProfile):
     def get_dashboard_data(cls, request):
         query = request.GET.get('q', '')
         all_users = CustomUser.objects.all()  # Fetch all users
+        all_users = all_users.exclude(role='admin')
         
         if query:
             all_users = all_users.filter(
