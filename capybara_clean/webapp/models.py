@@ -39,7 +39,7 @@ class CustomUser(AbstractUser):
             return reverse('dashboard')
         else:
             return reverse('login')
-
+    
     @classmethod
     def authenticate_user(cls, username, password):
         user = authenticate(username=username, password=password)

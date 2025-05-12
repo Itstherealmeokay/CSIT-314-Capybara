@@ -14,13 +14,13 @@ from datetime import datetime
 from .forms import *
 from .models import *
 
-class HomeView(View):
+class HomeViewController(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard')
         return render(request, 'webapp/index.html')
 
-class RegisterView(View):
+class RegisterViewController(View):
     def get(self, request):
         return render(request, 'webapp/register.html', {'form': CreateUserForm()})
     
@@ -42,7 +42,7 @@ class RegisterView(View):
             AdminUser.objects.create(user=user)
         return redirect('login')
     
-class EditProfileView(LoginRequiredMixin, View):
+class EditProfileViewController(LoginRequiredMixin, View):
     def get(self, request):
         context = UserProfile.get_edit_context(request)
         return render(request, 'webapp/edit_profile.html', context)
@@ -66,7 +66,7 @@ class AdminUserEditController(LoginRequiredMixin, View):
         return render(request, 'webapp/adminuserupdate.html', context)
     
 
-class AdminUserAccountEditView(LoginRequiredMixin, View):
+class AdminUserAccountEditController(LoginRequiredMixin, View):
     def get(self, request, user_id):
         form, user_obj = AdminUser.get_user_account_form(user_id)
         return render(request, 'webapp/adminuser_edit_account.html', {'form': form, 'user_obj': user_obj})
@@ -78,7 +78,7 @@ class AdminUserAccountEditView(LoginRequiredMixin, View):
         return render(request, 'webapp/adminuser_edit_account.html', {'form': result, 'user_obj': CustomUser.objects.get(id=user_id)})
 
 
-class AdminUserSuspendToggleView(LoginRequiredMixin, View):
+class AdminUserSuspendToggleController(LoginRequiredMixin, View):
     def post(self, request, user_id):
         AdminUser.toggle_suspension(user_id)
         return redirect('dashboard')  # Or wherever your dashboard is
@@ -86,7 +86,7 @@ class AdminUserSuspendToggleView(LoginRequiredMixin, View):
 
 
 
-class LoginView(View):
+class LoginViewController(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard')
@@ -104,19 +104,19 @@ class LoginView(View):
         else:
             messages.error(request, error_message)
             return render(request, 'webapp/login.html', {'form': form})
-class Dashboard(LoginRequiredMixin, View):
+class DashboardController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
         dashdata = ViewDashboard().get_dash(request)
         return render(request, 'webapp/dashboard.html', dashdata)
 
-class ViewUserProfile(LoginRequiredMixin, View):
+class ViewUserProfileController(LoginRequiredMixin, View):
     def get(self, request):
         data = UserProfile().get_profile_info(request)
         return render(request, 'webapp/view_profile.html', data)
 
-class BrowseCleaners(LoginRequiredMixin, View):
+class BrowseCleanersController(LoginRequiredMixin, View):
     def get(self, request, pk):
         data = Homeowner.get_homeowner(request).get_cleaner_profile_data(pk)
         return render(request, 'webapp/cleaner_profile.html', data)
@@ -125,7 +125,7 @@ class BrowseCleaners(LoginRequiredMixin, View):
         data = Homeowner.get_homeowner(request).update_cleaner_favourite(pk)
         return render(request, 'webapp/cleaner_profile.html', data)
 
-class PropertyCreateView(LoginRequiredMixin, View):
+class PropertyCreateController(LoginRequiredMixin, View):
     def get(self, request):
         webpage = Homeowner().is_homeowner(request)
         form = PropertyForm()
@@ -136,7 +136,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
         return redirect_response  # always redirect after successful POST
 
 
-class PropertyUpdateView(LoginRequiredMixin, View):
+class PropertyUpdateController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, property_id):
@@ -147,7 +147,7 @@ class PropertyUpdateView(LoginRequiredMixin, View):
 
     
 
-class PropertyDeleteView(LoginRequiredMixin, View):
+class PropertyDeleteController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def post(self, request, property_id):
@@ -157,7 +157,7 @@ class PropertyDeleteView(LoginRequiredMixin, View):
 
 
 
-class BrowseCleanersView(LoginRequiredMixin, View):
+class BrowseCleanersViewController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
@@ -166,7 +166,7 @@ class BrowseCleanersView(LoginRequiredMixin, View):
     def post(self, request):
         return render(request, *Homeowner.handle_cleaner_favourite_removal(request))
 
-class CleaningListingsBrowse(LoginRequiredMixin, View):
+class CleaningListingsBrowseController(LoginRequiredMixin, View):
     def get(self, request):
         data = CleaningListing.get_browse_context(request)
         if 'redirect' in data:
@@ -174,13 +174,13 @@ class CleaningListingsBrowse(LoginRequiredMixin, View):
         return render(request, 'webapp/cleaning_listings_browse.html', data)
 
 
-class CleaningListingDetailView(LoginRequiredMixin, View):
+class CleaningListingDetailController(LoginRequiredMixin, View):
     def get(self, request, listing_id):
         listing = get_object_or_404(CleaningListing, id=listing_id)
         context = listing.get_detail_context_for_user(request.user)
         return render(request, 'webapp/cleaning_listing_view.html', context)
 
-class CleaningListingCreate(LoginRequiredMixin, View):
+class CleaningListingCreateController(LoginRequiredMixin, View):
     def get(self, request):
         context = CleaningListing.get_create_context(request)
         if 'redirect' in context:
@@ -194,7 +194,7 @@ class CleaningListingCreate(LoginRequiredMixin, View):
         return render(request, 'webapp/cleaning_listing_create.html', context)
 
 
-class HomeViewListings(LoginRequiredMixin, View):
+class HomeViewListingsController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, pk):
@@ -202,7 +202,7 @@ class HomeViewListings(LoginRequiredMixin, View):
         return render(request, 'webapp/homeviewlisting.html', context)
 
 
-class CleaningListingUpdate(LoginRequiredMixin, View):
+class CleaningListingUpdateController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, listing_id):
@@ -216,7 +216,7 @@ class CleaningListingUpdate(LoginRequiredMixin, View):
         return render(request, 'webapp/cleaning_listing_update.html', context)
 
 
-class CleaningListingFavourite(LoginRequiredMixin, View):
+class CleaningListingFavouriteController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def post(self, request, listing_id):
@@ -224,7 +224,7 @@ class CleaningListingFavourite(LoginRequiredMixin, View):
         return redirect(context['redirect'])
 
 
-class ApplyCleaningListing(LoginRequiredMixin, View):
+class ApplyCleaningListingController(LoginRequiredMixin, View):
     login_url = 'login'
     
     def get(self, request, listing_id):
@@ -239,7 +239,7 @@ class ApplyCleaningListing(LoginRequiredMixin, View):
             return redirect(context['redirect'])
         return render(request, 'webapp/cleaning_listing_apply.html', context)
     
-class CleaningListingDelete(LoginRequiredMixin, View):
+class CleaningListingDeleteController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def post(self, request, listing_id):
@@ -285,7 +285,7 @@ def cleaning_request_review(request, request_id):
     })
 
 
-class SearchRequestHistory(LoginRequiredMixin, View):
+class SearchRequestHistoryController(LoginRequiredMixin, View):
     def get(self, request):
         all_requests, search_query = CleaningRequest.get_filtered_requests(request)
 
@@ -311,7 +311,7 @@ def cleaning_request_completed(request, request_id):
     cleaning_request.save()
     return redirect('dashboard')
 
-class ServiceCategoryCreate(LoginRequiredMixin, View):
+class ServiceCategoryCreateController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
@@ -325,14 +325,14 @@ class ServiceCategoryCreate(LoginRequiredMixin, View):
         return render(request, 'webapp/service_category_create.html', context)
 
 
-class ServiceCategoryList(LoginRequiredMixin, View):
+class ServiceCategoryListController(LoginRequiredMixin, View):
     login_url = 'login'
     def get(self, request):
         context = ServiceCategory.get_list_context()
         return render(request, 'webapp/service_category_view.html', context)
 
 
-class ServiceCategoryDelete(LoginRequiredMixin, View):
+class ServiceCategoryDeleteController(LoginRequiredMixin, View):
     login_url = 'login'
     def post(self, request, category_id):
         context = ServiceCategory.handle_delete(request, category_id)
