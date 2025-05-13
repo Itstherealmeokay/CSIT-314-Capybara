@@ -501,14 +501,22 @@ class ServiceCategory(models.Model):
             return {'redirect': 'service_category_view'}
         return {'form': form}
     
-    @classmethod 
+
+    @classmethod
     def search(cls, request):
         query = request.GET.get('q', '').strip()
-        if query:
-            categories = cls.objects.filter(name__icontains=query)
-        else:
-            categories = cls.objects.all()
-        return {'categories': categories, 'query': query}
+        all_categories = cls.objects.filter(name__icontains=query) if query else cls.objects.all()
+
+        paginator = Paginator(all_categories, 3)  # Show 3 per page
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return {
+            'categories': page_obj.object_list,
+            'query': query,
+            'page_obj': page_obj,
+        }
+
 
 class CleaningListingStatus(models.TextChoices):
     OPEN = 'open'

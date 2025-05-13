@@ -353,6 +353,15 @@ class ServiceCategoryUpdateController(LoginRequiredMixin, View):
             return redirect(context['redirect'])
         return render(request, 'webapp/service_category_update.html', context)
 
+# views.py
+class ServiceCategorySearchController(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request):
+        context = ServiceCategory.search(request)
+        return render(request, 'webapp/service_category_view.html', context)
+
+
 
 
     

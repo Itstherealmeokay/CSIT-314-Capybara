@@ -42,6 +42,7 @@ urlpatterns = [
     path('service_category/', views.ServiceCategoryListController.as_view(), name='service_category_view'),
     path('service_category/<int:category_id>/update/', views.ServiceCategoryUpdateController.as_view(), name='service_category_update'),
     path('service_category/<int:category_id>/delete/', views.ServiceCategoryDeleteController.as_view(), name='service_category_delete'),
+    path('service_category/search/', views.ServiceCategorySearchController.as_view(), name='service_category_search'),
 ]
 
 
