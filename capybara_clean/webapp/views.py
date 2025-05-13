@@ -82,6 +82,14 @@ class AdminUserSuspendToggleController(LoginRequiredMixin, View):
     def post(self, request, user_id):
         AdminUser.toggle_suspension(user_id)
         return redirect('dashboard')  # Or wherever your dashboard is
+    
+class AdminUserSearchController(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request):
+        role = request.GET.get('role')  # e.g., 'cleaner', 'homeowner', etc.
+        context = AdminUser.search_users(request, role=role)
+        return render(request, 'webapp/adminusersearch.html', context)
 
 
 class LoginViewController(View):

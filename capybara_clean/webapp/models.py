@@ -196,6 +196,43 @@ class AdminUser(UserProfile):
         user.is_suspended = not user.is_suspended
         user.save()
         return user.is_suspended
+    
+    
+    @classmethod
+    def search_users(cls, request, role=None):
+        from webapp.models import Homeowner, Cleaner, PlatformManager, AdminUser, UserProfile
+
+        query = request.GET.get('q', '').strip()
+        page_number = request.GET.get('page')
+
+        if role == 'homeowner':
+            users = Homeowner.objects.select_related('user')
+        elif role == 'cleaner':
+            users = Cleaner.objects.select_related('user')
+        elif role == 'platform_manager':
+            users = PlatformManager.objects.select_related('user')
+        elif role == 'adminuser':
+            users = AdminUser.objects.select_related('user')
+        else:
+            users = UserProfile.objects.select_related('user')  # fallback
+
+        if query:
+            users = users.filter(
+                Q(user__email__icontains=query) |
+                Q(user__username__icontains=query) |
+                Q(full_name__icontains=query) |
+                Q(phone_number__icontains=query)
+            )
+
+        paginator = Paginator(users, 10)
+        page_obj = paginator.get_page(page_number)
+
+        return {
+            'query': query,
+            'role': role,
+            'page_obj': page_obj,
+            'users': page_obj.object_list,
+        }
         
     
 class Homeowner(UserProfile):

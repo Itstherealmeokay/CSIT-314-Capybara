@@ -59,6 +59,11 @@
         {% elif user.role == 'platform_manager' %}
           <li class="nav-item me-4">
             <a class="nav-link" href="{% url 'service_category_view' %}">Service Categories<i class="fa fa-users" aria-hidden="true"></i></a>
+          </li>
+        {% elif user.role == 'adminuser' %}
+          <li class="nav-item me-4">
+            <a class="nav-link" href="{% url 'adminuser_search' %}">Admin User Search<i class="fa fa-users" aria-hidden="true"></i></a>
+          </li>
         {% endif %}
         <li class="nav-item me-4">
           <a class="nav-link" href="{% url 'logout' %}">Sign out<i class="fa fa-sign-out" aria-hidden="true"></i></a>
