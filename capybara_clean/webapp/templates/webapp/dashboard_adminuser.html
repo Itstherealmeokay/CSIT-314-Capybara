@@ -18,26 +18,33 @@
 
 
     <ul class="list-group">
-    {% for users in all_users %}
+    {% for profile in all_users %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-                <h5 class="mb-1">{{ users.username }}</h5>
-                <p class="mb-1"><strong>Role:</strong> {{ users.role }}</p>
-                <p class="mb-1"><strong>Date Joined:</strong> {{ users.date_joined|date:"Y-m-d H:i" }}</p>
+                <h5 class="mb-1">{{ profile.user.username }}</h5>
+                <p class="mb-1"><strong>Role:</strong> {{ profile.user.role }}</p>
+                <p class="mb-1"><strong>Date Joined:</strong> {{ profile.user.date_joined|date:"Y-m-d H:i" }}</p>
             </div>
             <div>
-                <a href="{% url 'adminuserupdate' users.id %}" class="btn btn-sm btn-outline-secondary">Edit Profile</a>
-                <a href="{% url 'adminuser_edit_account' users.id %}" class="btn btn-sm btn-outline-primary">Edit Account</a>
-                <form method="post" action="{% url 'adminuser_suspend_toggle' users.id %}" style="display:inline;">
+                <a href="{% url 'adminuserupdate' profile.user.id %}" class="btn btn-sm btn-outline-secondary">Edit Profile</a>
+                <a href="{% url 'adminuser_edit_account' profile.user.id %}" class="btn btn-sm btn-outline-primary">Edit Account</a>
+                <form method="post" action="{% url 'adminuser_suspend_toggle' profile.user.id %}" style="display:inline;">
                     {% csrf_token %}
-                    {% if users.is_suspended %}
+                    {% if profile.user.is_suspended %}
                         <button type="submit" class="btn btn-sm btn-warning">Unsuspend</button>
                     {% else %}
                         <button type="submit" class="btn btn-sm btn-danger">Suspend</button>
                     {% endif %}
                 </form>
+                <form method="post" action="{% url 'adminuser_profile_suspend_toggle' profile.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if profile.is_suspended %}
+                        <button type="submit" class="btn btn-sm btn-warning">Unsuspend Profile</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-sm btn-danger">Suspend Profile</button>
+                    {% endif %}
+                </form>
             </div>
-        
 
         </li>
     {% endfor %}

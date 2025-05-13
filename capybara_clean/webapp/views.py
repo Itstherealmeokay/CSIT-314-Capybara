@@ -82,7 +82,12 @@ class AdminUserSuspendToggleController(LoginRequiredMixin, View):
     def post(self, request, user_id):
         AdminUser.toggle_suspension(user_id)
         return redirect('dashboard')  # Or wherever your dashboard is
-    
+
+class AdminUserSuspendProfileToggleController(LoginRequiredMixin, View):
+    def post(self, request, user_id):
+        AdminUser.toggle_suspension_profile(user_id)
+        return redirect('dashboard')
+
 class AdminUserSearchController(LoginRequiredMixin, View):
     login_url = 'login'
 
@@ -114,6 +119,8 @@ class DashboardController(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request):
+        if UserProfile.objects.filter(user=request.user).first().is_suspended:
+            return render(request, 'webapp/suspended.html')
         dashdata = ViewDashboard().get_dash(request)
         return render(request, 'webapp/dashboard.html', dashdata)
 

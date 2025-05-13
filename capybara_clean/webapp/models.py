@@ -60,6 +60,7 @@ class UserProfile(models.Model):
     full_name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=20)
+    is_suspended = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -143,8 +144,8 @@ class AdminUser(UserProfile):
     @classmethod
     def get_dashboard_data(cls, request):
         query = request.GET.get('q', '')
-        all_users = CustomUser.objects.all()  # Fetch all users
-        all_users = all_users.exclude(role='admin')
+        all_users = UserProfile.objects.all()  # Fetch all users
+        all_users = all_users.exclude(user__role='admin')
         
         if query:
             all_users = all_users.filter(
@@ -197,6 +198,12 @@ class AdminUser(UserProfile):
         user.save()
         return user.is_suspended
     
+    @classmethod
+    def toggle_suspension_profile(cls, user_id):
+        user = UserProfile.objects.get(id=user_id)
+        user.is_suspended = not user.is_suspended
+        user.save()
+        return user.is_suspended
     
     @classmethod
     def search_users(cls, request, role=None):
