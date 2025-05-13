@@ -335,6 +335,24 @@ class ServiceCategoryDeleteController(LoginRequiredMixin, View):
     def post(self, request, category_id):
         context = ServiceCategory.handle_delete(request, category_id)
         return redirect(context.get('redirect', 'service_category_view'))
+    
+class ServiceCategoryUpdateController(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, category_id):
+        # Display form
+        category = get_object_or_404(ServiceCategory, id=category_id)
+        from .forms import ServiceCategoryForm
+        form = ServiceCategoryForm(instance=category)
+        return render(request, 'webapp/service_category_update.html', {'form': form})
+
+    def post(self, request, category_id):
+        # Handle form submission
+        context = ServiceCategory.handle_update(request, category_id)
+        if context.get('redirect'):
+            return redirect(context['redirect'])
+        return render(request, 'webapp/service_category_update.html', context)
+
 
 
     

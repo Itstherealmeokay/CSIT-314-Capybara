@@ -485,6 +485,30 @@ class ServiceCategory(models.Model):
         category = get_object_or_404(cls, id=category_id)
         category.delete()
         return {'redirect': 'service_category_view'}
+    
+    @classmethod
+    def handle_update(cls, request, category_id):
+        if request.user.role != 'platform_manager':
+            return {'redirect': 'dashboard'}
+
+        category = get_object_or_404(cls, id=category_id)
+        from .forms import ServiceCategoryForm
+        from django.contrib import messages
+        form = ServiceCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Service category updated successfully.')
+            return {'redirect': 'service_category_view'}
+        return {'form': form}
+    
+    @classmethod 
+    def search(cls, request):
+        query = request.GET.get('q', '').strip()
+        if query:
+            categories = cls.objects.filter(name__icontains=query)
+        else:
+            categories = cls.objects.all()
+        return {'categories': categories, 'query': query}
 
 class CleaningListingStatus(models.TextChoices):
     OPEN = 'open'

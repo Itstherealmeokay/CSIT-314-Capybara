@@ -1,0 +1,23 @@
+{% extends "webapp/base.html" %}
+
+{% block title %}Update Service Category{% endblock %}
+
+{% block content %}
+  <h2>Update Service Category</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a href="{% url 'service_category_view' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

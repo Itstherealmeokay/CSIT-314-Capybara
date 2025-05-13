@@ -22,11 +22,11 @@
               <td>{{ forloop.counter }}</td>
               <td>{{ category.name }}</td>
               <td class="text-end">
+                <a href="{% url 'service_category_update' category.id %}" class="btn btn-primary btn-sm">Edit</a>
                 <form method="post" action="{% url 'service_category_delete' category.id %}" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
-                
               </td>
             </tr>
           {% endfor %}
