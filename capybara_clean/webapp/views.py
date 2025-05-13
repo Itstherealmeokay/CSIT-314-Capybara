@@ -84,8 +84,6 @@ class AdminUserSuspendToggleController(LoginRequiredMixin, View):
         return redirect('dashboard')  # Or wherever your dashboard is
 
 
-
-
 class LoginViewController(View):
     def get(self, request):
         if request.user.is_authenticated:
