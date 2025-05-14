@@ -3,7 +3,14 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h3>Edit Account for {{ user_obj.username }}</h3>
+    <h3>View {{ user_obj.username }}'s Account</h3>
+    <h4>User Details</h4>
+    <p><strong>Username:</strong> {{ user_obj.username }}</p>
+    <p><strong>Role:</strong> {{ user_obj.role }}</p>
+    <p><strong>Hashed Password:</strong> {{ user_obj.password }}</p>
+
+
+    <h5>Edit Account for {{ user_obj.username }}</h5>
     <form method="post">
         {% csrf_token %}
         {{ form|crispy }}

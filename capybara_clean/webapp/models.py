@@ -241,6 +241,10 @@ class AdminUser(UserProfile):
             'users': page_obj.object_list,
         }
         
+    @classmethod
+    def get_admin_view_context(cls, user_id):
+        users = UserProfile.objects.get(id=user_id)
+        return {'users': users}
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

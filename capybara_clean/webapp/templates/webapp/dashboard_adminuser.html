@@ -26,6 +26,8 @@
                 <p class="mb-1"><strong>Date Joined:</strong> {{ profile.user.date_joined|date:"Y-m-d H:i" }}</p>
             </div>
             <div>
+                
+                <a href="{% url 'adminuser_view_profile' profile.id %}" class="btn btn-sm btn-outline-secondary">View Profile</a>
                 <a href="{% url 'adminuserupdate' profile.user.id %}" class="btn btn-sm btn-outline-secondary">Edit Profile</a>
                 <a href="{% url 'adminuser_edit_account' profile.user.id %}" class="btn btn-sm btn-outline-primary">Edit Account</a>
                 <form method="post" action="{% url 'adminuser_suspend_toggle' profile.user.id %}" style="display:inline;">

@@ -17,6 +17,8 @@ urlpatterns = [
     path('adminuser/suspend/<int:user_id>/', views.AdminUserSuspendToggleController.as_view(), name='adminuser_suspend_toggle'),
     path('adminuser/suspendprofile/<int:user_id>/', views.AdminUserSuspendProfileToggleController.as_view(), name='adminuser_profile_suspend_toggle'),
     path('adminuser/search/', views.AdminUserSearchController.as_view(), name='adminuser_search'),
+    path('adminuser/<int:user_id>/view_profile/', views.AdminUserViewProfileController.as_view(), name='adminuser_view_profile'),
+    #path('adminuser/<int:user_id>/view_account/', views.AdminUserViewAccountController.as_view(), name='adminuser_view_account'),
 
     
     path('browsecleaners/', views.BrowseCleanersViewController.as_view(), name='browsecleaners'),

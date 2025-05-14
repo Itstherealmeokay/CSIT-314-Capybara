@@ -1,0 +1,13 @@
+{% extends 'webapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bg-light shadow-md, p-5">
+  <h2>My Profile</h2>
+  <hr>
+  <p><strong>Name:</strong> {{ users.full_name }}</p>
+  <!-- <p><strong>Email:</strong> {{ profile.user.emailaddress }}</p> -->
+  <p><strong>Phone Number:</strong> {{ users.phone_number }}</p>
+  <p><strong>Address:</strong> {{ users.address }}</p>
+</div>
+{% endblock %}

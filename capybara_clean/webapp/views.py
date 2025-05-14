@@ -76,6 +76,11 @@ class AdminUserAccountEditController(LoginRequiredMixin, View):
         if success:
             return redirect('dashboard')
         return render(request, 'webapp/adminuser_edit_account.html', {'form': result, 'user_obj': CustomUser.objects.get(id=user_id)})
+    
+class AdminUserViewProfileController(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        context = AdminUser.get_admin_view_context(user_id)
+        return render(request, 'webapp/adminuser_view_profile.html', context)
 
 
 class AdminUserSuspendToggleController(LoginRequiredMixin, View):
