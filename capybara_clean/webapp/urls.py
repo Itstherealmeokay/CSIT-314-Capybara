@@ -33,6 +33,9 @@ urlpatterns = [
     path('cleaner/<int:pk>/listings/', views.HomeViewListingsController.as_view(), name='cleaner_listings_view'),
     path('request_history/', views.SearchRequestHistoryController.as_view(), name='request_history'),
 
+    path('cleaner/match_history/', views.CleanerMatchHistoryController.as_view(), name='cleaner_match_history'),
+
+
     path('cleaner/requests/<int:request_id>/accept/', views.cleaning_request_accept, name='cleaning_request_accept'),
     path('cleaner/requests/<int:request_id>/decline/', views.cleaning_request_decline, name='cleaning_request_decline'),
     path('cleaner/requests/<int:request_id>/completed/', views.cleaning_request_completed, name='cleaning_request_completed'),

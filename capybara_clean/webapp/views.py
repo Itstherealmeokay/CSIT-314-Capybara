@@ -316,7 +316,24 @@ class SearchRequestHistoryController(LoginRequiredMixin, View):
             'search_query': search_query   
         })
 
+class CleanerMatchHistoryController(LoginRequiredMixin, View):
+    def get(self, request):
+        all_requests, search_query = CleaningRequest.get_cleaner_filtered_requests(request)
 
+        return render(request, 'webapp/cleaner_match_history.html', {
+            'all_requests': all_requests,
+            'search_query': search_query   
+        })
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 def refresh_cleaner_rating(cleaner):
     all_requests = CleaningRequest.objects.filter(
         Q(cleaning_listing__cleaner=cleaner) & Q(status=CleaningRequestStatus.COMPLETED)

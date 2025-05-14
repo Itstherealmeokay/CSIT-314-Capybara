@@ -817,5 +817,18 @@ class CleaningRequest(models.Model):
                 Q(status__icontains=search_query)
             )
         return queryset.order_by('-request_date'), search_query
+    
+    @classmethod
+    def get_cleaner_filtered_requests(cls, request):
+        user = request.user
+        search_query = request.GET.get('search')
+        queryset = cls.objects.filter(cleaning_listing__cleaner__user=user)
+        if search_query:
+            queryset = queryset.filter(
+                Q(cleaning_listing__name__icontains=search_query) |
+                Q(request_date__icontains=search_query) |
+                Q(status__icontains=search_query)
+            )
+        return queryset.order_by('-request_date'), search_query
 
 
