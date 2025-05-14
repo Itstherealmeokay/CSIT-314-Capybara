@@ -34,7 +34,7 @@ class AdminUserEditForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username']
+        fields = ['username', 'email']
 
     def clean(self):
         cleaned_data = super().clean()

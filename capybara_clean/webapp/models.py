@@ -135,9 +135,7 @@ class ViewDashboard(models.Model):
             return PlatformManager.objects.get(user=user).get_dashboard_data()
         elif user.role == 'adminuser':
             return AdminUser.objects.get(user=user).get_dashboard_data(request)  
-        
-#fake useradmin
-
+    
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class AdminUser(UserProfile):
@@ -149,9 +147,8 @@ class AdminUser(UserProfile):
         
         if query:
             all_users = all_users.filter(
-                Q(first_name__icontains=query) |
-                Q(last_name__icontains=query) |
-                Q(username__icontains=query)
+                Q(full_name__icontains=query) |
+                Q(user__username__icontains=query)
             )
         
         # Pagination logic
@@ -245,6 +242,12 @@ class AdminUser(UserProfile):
     def get_admin_view_context(cls, user_id):
         users = UserProfile.objects.get(id=user_id)
         return {'users': users}
+    
+    @classmethod
+    def get_admin_viewaccount_context(cls, user_id):
+        from .forms import AdminUserEditForm
+        user_account = CustomUser.objects.get(id=user_id)
+        return {'user_account': user_account}
     
 class Homeowner(UserProfile):
     favourite_cleaners = models.ManyToManyField('Cleaner', related_name='favourite_cleaners', blank=True)

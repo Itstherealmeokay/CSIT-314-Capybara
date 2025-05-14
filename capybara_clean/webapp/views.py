@@ -82,6 +82,10 @@ class AdminUserViewProfileController(LoginRequiredMixin, View):
         context = AdminUser.get_admin_view_context(user_id)
         return render(request, 'webapp/adminuser_view_profile.html', context)
 
+class AdminUserViewAccountController(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        context = AdminUser.get_admin_viewaccount_context(user_id)
+        return render(request, 'webapp/adminuser_view_account.html', context)
 
 class AdminUserSuspendToggleController(LoginRequiredMixin, View):
     def post(self, request, user_id):
